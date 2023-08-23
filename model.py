@@ -3,19 +3,21 @@ import tensorflow as tf
 from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, concatenate, Reshape
 from keras.models import Model
 
-def CustomModelWithLocalization(num_objects):
+def customModelWithLocalization(num_objects):
     # Input layer
     inputs = Input(shape=(64, 64, 3))
 
     # CNN layers
-    x = Conv2D(32, (3, 3), activation='relu')(inputs)
+    x = Conv2D(16, (3, 3), activation='relu')(inputs)
+    x = MaxPooling2D((2, 2))(x)
+    x = Conv2D(32, (3, 3), activation='relu')(x)
     x = MaxPooling2D((2, 2))(x)
     x = Conv2D(64, (3, 3), activation='relu')(x)
     x = MaxPooling2D((2, 2))(x)
     x = Flatten()(x)
 
     # MLP layers for object localization
-    x_dense = Dense(64, activation='relu')(x)
+    x_dense = Dense(8, activation='relu')(x)
     outputs = []
     for _ in range(num_objects):
         output = Dense(3, activation='linear')(x_dense)  # Output x, y, confidence score
@@ -34,36 +36,34 @@ def CustomModelWithLocalization(num_objects):
 
     return model
 
-# Create the custom model with object localization
-num_objects = 10
+# # Create the custom model with object localization
+# num_objects = 10
 
-model = CustomModelWithLocalization(num_objects)
-# model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
-# Define individual loss functions for coordinates and confidence scores
-def coordinates_loss(y_true, y_pred):
-    return tf.keras.losses.mean_squared_error(y_true[:, :, :2], y_pred[:, :, :2])
+# model = customModelWithLocalization(num_objects)
+# # model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
+# # Define individual loss functions for coordinates and confidence scores
+# def coordinates_loss(y_true, y_pred):
+#     return tf.keras.losses.mean_squared_error(y_true[:, :, :2], y_pred[:, :, :2])
 
-def confidence_loss(y_true, y_pred):
-    return tf.keras.losses.binary_crossentropy(y_true[:, :, 2:], y_pred[:, :, 2:])
+# def confidence_loss(y_true, y_pred):
+#     return tf.keras.losses.binary_crossentropy(y_true[:, :, 2:], y_pred[:, :, 2:])
 
-# Compile the model with separate loss functions for each output
-model.compile(optimizer='adam', loss=[coordinates_loss, confidence_loss], metrics=['accuracy'])
+# # Compile the model with separate loss functions for each output
+# model.compile(optimizer='adam', loss=[coordinates_loss, confidence_loss], metrics=['accuracy'])
 
-# Generate example input data
-num_samples = 2  # Small number of samples for illustration
-X_train = np.random.rand(num_samples, 64, 64, 3)
+# # Generate example input data
+# num_samples = 2  # Small number of samples for illustration
+# X_train = np.random.rand(num_samples, 64, 64, 3)
 
-# Generate example labels (for illustration)
-y_train = np.random.rand(num_samples, num_objects, 3)
+# # Generate example labels (for illustration)
+# y_train = np.random.rand(num_samples, num_objects, 3)
 
-print(y_train)
+# print(y_train)
 
-# Train the model
-model.fit(X_train, y_train, epochs=10, batch_size=2, verbose=1)
+# # Train the model
+# model.fit(X_train, y_train, epochs=10, batch_size=2, verbose=1)
 
-# Example inference
-output_ = model.predict(X_train)
-print("Model output (x, y, confidence) for each object:")
-print(output_)
-
-model.summary()
+# # Example inference
+# output_ = model.predict(X_train)
+# print("Model output (x, y, confidence) for each object:")
+# print(output_)
