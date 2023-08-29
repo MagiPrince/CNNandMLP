@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, concatenate, Reshape
+from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, concatenate, Reshape, AveragePooling2D
 from keras.models import Model
 
 def customModelWithLocalization(num_objects):
@@ -9,18 +9,24 @@ def customModelWithLocalization(num_objects):
 
     # CNN layers
     x = Conv2D(16, (3, 3), activation='relu')(inputs)
-    x = MaxPooling2D((2, 2))(x)
+    x = AveragePooling2D((2, 2))(x)
     x = Conv2D(32, (3, 3), activation='relu')(x)
     x = MaxPooling2D((2, 2))(x)
+    x = Conv2D(32, (1, 1), activation='relu')(x)
     x = Conv2D(64, (3, 3), activation='relu')(x)
+    x = MaxPooling2D((2, 2))(x)
+    x = Conv2D(64, (1, 1), activation='relu')(x)
+    x = Conv2D(128, (3, 3), activation='relu')(x)
     x = MaxPooling2D((2, 2))(x)
     x = Flatten()(x)
 
     # MLP layers for object localization
-    x_dense = Dense(8, activation='relu')(x)
+    x_dense = Dense(128, activation='relu')(x)
+    x_dense = Dense(64, activation='relu')(x_dense)
+    x_dense = Dense(32, activation='relu')(x_dense)
     outputs = []
     for _ in range(num_objects):
-        output = Dense(3, activation='linear')(x_dense)  # Output x, y, confidence score
+        output = Dense(2, activation='linear')(x_dense)  # Output x, y, confidence score
         outputs.append(output)
 
     # Concatenate outputs and reshape to [batch_size, num_objects, 3]
@@ -29,7 +35,7 @@ def customModelWithLocalization(num_objects):
     for output in outputs[1:]:
         concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
     # concatenated_outputs = concatenate(outputs, axis=1)
-    reshaped_outputs = Reshape((num_objects, 3))(concatenated_outputs)
+    reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)
 
     # Create the model
     model = Model(inputs=inputs, outputs=reshaped_outputs)

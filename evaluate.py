@@ -6,9 +6,9 @@ import os
 import sys
 import copy
 
-NAME_BACKBONE = "yolo_v8_xs_backbone"
+NAME_BACKBONE = "cnn_and_mlp"
 CONFIDENCE = 0.5
-IOU_THRESHOLD = 0.5
+IOU_THRESHOLD = 0.2
 
 
 def intersection_over_union(boxA, boxB):
@@ -47,10 +47,7 @@ images_test = np.load("matrices_test.npy")
 
 print("Nb images : " + str(len(images_test)))
 
-labels_test = {
-    "boxes": np.load("labels_test.npy"),
-    "classes": np.load("classes_test.npy")
-}
+labels_test = np.load("labels_test.npy")
 
 model = customModelWithLocalization(30)
 
@@ -70,37 +67,35 @@ false_negative = 0
 ap_array_labels = []
 ap_array_scores = []
 
-for i in range(len(results["boxes"].to_tensor())):
-    detection_over_confidence = 0
+for i in range(len(results)):
+    detection_in_range= 0
     true_detection = 0
-    boxes_gt = []
-    for j in range(len(labels_test["boxes"][i])):
-        if labels_test["classes"][i][j] == 1:
-            boxes_gt.append(copy.deepcopy(labels_test["boxes"][i][j].tolist()))
 
-    for j in range(len(results["boxes"][i])):
-        if results["classes"][i][j] == 1 and results["confidence"][i][j] >= CONFIDENCE:
-            detection_over_confidence += 1
+    coord_gt = []
+    for j in range(len(labels_test[i])):
+        if labels_test[i][j][0] < 45 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5:
+            coord_gt.append(copy.deepcopy(labels_test[i][j][:2].tolist()))
+
+    for j in range(len(results[i])):
+        if results[i][j][0] < 45 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59:
+            detection_in_range += 1
             index_iou = -1
             best_iou = -1
-            # boxes.append(results["boxes"][i][j])
-            for k in range(len(boxes_gt)):
-                gt_box = [boxes_gt[k][0]-int(round(boxes_gt[k][2]/2)), boxes_gt[k][1]-int(round(boxes_gt[k][3]/2)), boxes_gt[k][2], boxes_gt[k][3]]
-                pred_box = [tf.get_static_value(results["boxes"][i][j][0]-(results["boxes"][i][j][2]/2)), tf.get_static_value(results["boxes"][i][j][1]-(results["boxes"][i][j][3]/2)), tf.get_static_value(results["boxes"][i][j][2]), tf.get_static_value(results["boxes"][i][j][3])]
+            for k in range(len(coord_gt)):
+                gt_box = [coord_gt[k][0]-5, coord_gt[k][1]-5, 10, 10]
+                pred_box = [results[i][j][0]-5, results[i][j][1]-5, 10, 10]
                 iou = intersection_over_union(gt_box, pred_box)
                 if iou > best_iou:
                     best_iou = iou
                     index_iou = k
-
+            
             if best_iou >= IOU_THRESHOLD:
-                boxes_gt.pop(index_iou)
+                coord_gt.pop(index_iou)
                 true_detection += 1
-                
-                # print(best_iou)
-
+    
     true_positif += true_detection
-    false_positif += detection_over_confidence-true_detection
-    false_negative += len(boxes_gt)
+    false_positif += detection_in_range-true_detection
+    false_negative += len(coord_gt)
 
 print("True positif : " + str(true_positif))
 print("False positif : " + str(false_positif))
