@@ -27,6 +27,7 @@ def customModelWithLocalization(num_objects):
     outputs = []
     for _ in range(num_objects):
         output = Dense(2, activation='linear')(x_dense)  # Output x, y, confidence score
+        output = concatenate([output, Dense(1, activation='sigmoid')(x_dense)], axis=1)
         outputs.append(output)
 
     # Concatenate outputs and reshape to [batch_size, num_objects, 3]
@@ -35,7 +36,7 @@ def customModelWithLocalization(num_objects):
     for output in outputs[1:]:
         concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
     # concatenated_outputs = concatenate(outputs, axis=1)
-    reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)
+    reshaped_outputs = Reshape((num_objects, 3))(concatenated_outputs)
 
     # Create the model
     model = Model(inputs=inputs, outputs=reshaped_outputs)

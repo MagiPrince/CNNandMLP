@@ -9,7 +9,7 @@ import copy
 
 NAME_BACKBONE = "cnn_and_mlp"
 CONFIDENCE = 0.5
-IOU_THRESHOLD = 0.1
+IOU_THRESHOLD = 0.5
 
 
 def intersection_over_union(boxA, boxB):

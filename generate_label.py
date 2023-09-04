@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 
-path_jet = "../keras-cv-yolov8-quantized/simulated_data/jets/"
+path_jet = "data/jet/"
 
 ETA = 2.4
 PHI = 3.15
@@ -97,7 +97,7 @@ for folder_element, jet_file in enumerate(dir_files_jet):
         else:
             labels_training.append(tmp_labels)
 
-        print(tmp_labels)
+        # print(tmp_labels)
 
     # if folder_element+1 >= 4:
     #     break

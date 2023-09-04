@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 GRANULARITY = 0.1
 SIZE_FINAL_MATRIX = 64
 
-path_calocell = "../keras-cv-yolov8-quantized/simulated_data/calocells/"
+path_calocell = "data/calocell/"
 
 def normalization_method(val, method, min=0, max=0, mean=0, std=0):
     if method == 0:

@@ -52,6 +52,7 @@ def resnetModelWithLocalization(num_objects):
     outputs = []
     for _ in range(num_objects):
         output = Dense(2, activation='linear')(act2)  # Output x, y, confidence score
+        # output = concatenate([output, Dense(1, activation='sigmoid')(act2)], axis=1)
         outputs.append(output)
 
     # Concatenate outputs and reshape to [batch_size, num_objects, 3]
