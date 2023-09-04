@@ -1,4 +1,5 @@
 from model import customModelWithLocalization
+from resnet_and_mlp import resnetModelWithLocalization
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
@@ -6,13 +7,13 @@ import os
 from matplotlib import pyplot as plt
 
 NAME_BACKBONE = "cnn_and_mlp"
-TRAIN = False
+TRAIN = True
 
 images = np.load("matrices_training.npy")
 
 labels = np.load("labels_training.npy")
 
-model = customModelWithLocalization(30)
+model = resnetModelWithLocalization(30)
 
 def coordinates_loss(y_true, y_pred):
     return tf.keras.losses.mean_squared_error(y_true[:, :, :2], y_pred[:, :, :2])
@@ -48,8 +49,8 @@ else:
     model.compile(optimizer='adam', loss=[coordinates_loss, confidence_loss], metrics=['accuracy'])
 
     len_labels = len(labels)
-    sorted_labels = labels[:, labels[:, :, 0].argsort()][np.diag_indices(len_labels)]
-    sorted_labels = sorted_labels[:,:,:-1]
+    # sorted_labels = labels[:, labels[:, :, 0].argsort()][np.diag_indices(len_labels)]
+    # sorted_labels = sorted_labels[:,:,:-1]
     # print(sorted_labels)
 
     images_validation = np.load("matrices_validation.npy")
@@ -57,7 +58,7 @@ else:
     labels_validation = np.load("labels_validation.npy")
     labels_validation = labels_validation[:,:,:-1]
 
-    model.fit(images, sorted_labels, validation_data=(images_validation, labels_validation), epochs=100, batch_size=32)
+    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=100, batch_size=32)
 
     model.save_weights(NAME_BACKBONE+".h5", overwrite="True", save_format="h5", options=None)
 

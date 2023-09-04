@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from model import customModelWithLocalization
+from resnet_and_mlp import resnetModelWithLocalization
 import numpy as np
 import os
 import sys
@@ -8,7 +9,7 @@ import copy
 
 NAME_BACKBONE = "cnn_and_mlp"
 CONFIDENCE = 0.5
-IOU_THRESHOLD = 0.2
+IOU_THRESHOLD = 0.1
 
 
 def intersection_over_union(boxA, boxB):
@@ -49,7 +50,7 @@ print("Nb images : " + str(len(images_test)))
 
 labels_test = np.load("labels_test.npy")
 
-model = customModelWithLocalization(30)
+model = resnetModelWithLocalization(30)
 
 if not os.path.isfile(NAME_BACKBONE+".h5"):
     sys.exit(1)
