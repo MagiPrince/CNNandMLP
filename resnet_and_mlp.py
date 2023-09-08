@@ -17,11 +17,11 @@ def basic_block(x, filters, strides=(1, 1)):
     x = BatchNormalization()(x)
     
     # Shortcut connection
-    if strides != (1, 1) or shortcut.shape[-1] != filters:
-        shortcut = Conv2D(filters, (1, 1), strides=strides, padding='same')(shortcut)
-        shortcut = BatchNormalization()(shortcut)
+    # if strides != (1, 1) or shortcut.shape[-1] != filters:
+    #     shortcut = Conv2D(filters, (1, 1), strides=strides, padding='same')(shortcut)
+    #     shortcut = BatchNormalization()(shortcut)
     
-    x = Add()([x, shortcut])
+    # x = Add()([x, shortcut])
     x = Activation('relu')(x)
     
     return x

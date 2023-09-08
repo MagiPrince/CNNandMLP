@@ -48,12 +48,12 @@ else:
     # Train model
     model.compile(optimizer='adam', loss="mean_squared_error", metrics=['accuracy'])
 
-    labels = labels[:,:,:2]
+    labels = labels[:,:,:4]
 
     images_validation = np.load("matrices_validation.npy")
 
     labels_validation = np.load("labels_validation.npy")
-    labels_validation = labels_validation[:,:,:2]
+    labels_validation = labels_validation[:,:,:4]
 
     # model.summary()
 
@@ -62,7 +62,7 @@ else:
     mcp_save_loss_min = ModelCheckpoint('loss_min.h5', save_best_only=True, save_weights_only=True, monitor='loss', mode='min')
     reduce_lr_loss = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50, verbose=1, mode='min')
 
-    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=500, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, reduce_lr_loss])
+    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=5000, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min])
 
     model.save_weights(NAME_BACKBONE+".h5", overwrite="True", save_format="h5", options=None)
 

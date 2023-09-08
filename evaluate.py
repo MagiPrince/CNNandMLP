@@ -7,7 +7,7 @@ import os
 import sys
 import copy
 
-NAME_BACKBONE = "cnn_and_mlp"
+NAME_BACKBONE = "loss_min"
 CONFIDENCE = 0.5
 IOU_THRESHOLD = 0.5
 
