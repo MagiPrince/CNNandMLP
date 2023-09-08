@@ -134,14 +134,14 @@ for folder_element, calocell_file in enumerate(dir_files):
         else:
             matrices_training.append(matrix)
 
-        # im = Image.fromarray(matrix, 'RGB')
+        im = Image.fromarray(matrix, 'RGB')
 
-        # plt.imshow(im)
-        # plt.show()
+        plt.imshow(im)
+        plt.show()
     
     # if folder_element+1 >= 4:
     #     break
 
-np.save("matrices_training.npy", np.array(matrices_training))
-np.save("matrices_validation.npy", np.array(matrices_validation))
-np.save("matrices_test.npy", np.array(matrices_test))
+# np.save("matrices_training.npy", np.array(matrices_training))
+# np.save("matrices_validation.npy", np.array(matrices_validation))
+# np.save("matrices_test.npy", np.array(matrices_test))

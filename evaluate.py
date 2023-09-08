@@ -48,7 +48,7 @@ images_test = np.load("matrices_test.npy")
 
 print("Nb images : " + str(len(images_test)))
 
-labels_test = np.load("labels_test.npy")
+labels_test = np.load("labels_test.npy")[0]
 
 model = resnetModelWithLocalization(30)
 
@@ -78,7 +78,7 @@ for i in range(len(results)):
             coord_gt.append(copy.deepcopy(labels_test[i][j][:2].tolist()))
 
     for j in range(len(results[i])):
-        if results[i][j][0] < 45 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59:
+        if results[i][j][0] < 45 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59:# and results[i][j][-1] > CONFIDENCE:
             detection_in_range += 1
             index_iou = -1
             best_iou = -1

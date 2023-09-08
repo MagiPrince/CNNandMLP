@@ -69,7 +69,7 @@ for folder_element, jet_file in enumerate(dir_files_jet):
         # print(len(df_jet['eta_rounded']))
 
         for j in range(len(df_jet['eta_rounded'])):
-            label = [55, 32, 0]
+            label = [55, 32, 0, 0, 0]
             # Check if the value is not a NaN
             if df_jet['eta_rounded'].iloc[j] == df_jet['eta_rounded'].iloc[j]:
                 # Check if the coordinate eta is in the covered range
@@ -79,9 +79,12 @@ for folder_element, jet_file in enumerate(dir_files_jet):
                     x = round((df_jet['eta_rounded'].iloc[j] + ETA) / (ETA*2) * (LEN_ETA-1)) #/ LEN_ETA
                     y = round((df_jet['phi_rounded'].iloc[j] + PHI) / (PHI*2) * (LEN_PHI-1)) #/ LEN_PHI
 
-                    label = [x, y, 1]
+                    label = [x, y, 10, 10, 1]
 
             tmp_labels.append(label)
+
+        # sort labels by x coordinate
+        tmp_labels = sorted(tmp_labels, key=lambda x: x[0], reverse=False)
 
         if len(df_jet['eta_rounded']) < 30:
             for j in range(30-len(df_jet['eta_rounded'])):

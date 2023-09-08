@@ -17,10 +17,10 @@ labels = np.load("labels_training.npy")
 model = resnetModelWithLocalization(30)
 
 def coordinates_loss(y_true, y_pred):
-    return tf.keras.losses.mean_squared_error(y_true[:, :, :2], y_pred[:, :, :2])
+    return tf.keras.losses.mean_squared_error(y_true[:, :, :4], y_pred[:, :, :4])
 
 def confidence_loss(y_true, y_pred):
-    return tf.keras.losses.binary_crossentropy(y_true[:, :, 2:], y_pred[:, :, 2:])
+    return tf.keras.losses.binary_crossentropy(y_true[:, :, 4:], y_pred[:, :, 4:])
 
 # Compile the model with separate loss functions for each output
 model.compile(optimizer='adam', loss=[coordinates_loss, confidence_loss], metrics=['accuracy'])
@@ -29,47 +29,40 @@ if os.path.isfile(NAME_BACKBONE+".h5") and not TRAIN:
 
     images_test = np.load("matrices_test.npy")
 
-    labels_test = np.load("labels_test.npy")
+    labels_test = np.load("labels_test.npy")[0]
 
     model.load_weights(NAME_BACKBONE+".h5", skip_mismatch=False, by_name=False, options=None)
 
     # Get predictions using the model
-    pred = model.predict(images_test[3:4])[0]
+    pred = model.predict(images_test[4:5])[0]
     print(pred.shape)
     print(pred[pred[:, 0].argsort()])
-    lab = labels_test[3:4][0]
+    lab = labels_test[4:5][0]
     print(lab[lab[:, 0].argsort()])
 
     # model.summary()
-
-    plt.imshow(images_test[3:4][0])
+    plt.imshow(images_test[4:5][0])
     plt.show()
 
 else:
     # Train model
-    model.compile(optimizer='adam', loss=[coordinates_loss], metrics=['accuracy'])
+    model.compile(optimizer='adam', loss="mean_squared_error", metrics=['accuracy'])
 
-    len_labels = len(labels)
-    tmp_labels = labels[:len(labels)//2]
-    sorted_labels = tmp_labels[:, tmp_labels[:, :, 0].argsort()][np.diag_indices(len(tmp_labels))]
-    tmp_labels = labels[len(labels)//2:]
-    sorted_labels = sorted_labels + tmp_labels[:, tmp_labels[:, :, 0].argsort()][np.diag_indices(len(tmp_labels))]
-    sorted_labels = sorted_labels[:,:,:-1]
-    print(sorted_labels)
+    labels = labels[:,:,:2]
 
     images_validation = np.load("matrices_validation.npy")
 
     labels_validation = np.load("labels_validation.npy")
-    labels_validation = labels_validation[:, labels_validation[:, :, 0].argsort()][np.diag_indices(len(labels_validation))]
-    labels_validation = labels_validation[:,:,:-1]
+    labels_validation = labels_validation[:,:,:2]
 
     # model.summary()
 
-    # earlyStopping = EarlyStopping(monitor='val_loss', patience=40, verbose=0, mode='min')
-    mcp_save = ModelCheckpoint('.weights.h5', save_best_only=True, save_weights_only=True, monitor='val_loss', mode='min')
-    reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=50, verbose=1, min_delta=1e-1, mode='min')
+    earlyStopping = EarlyStopping(monitor='loss', patience=400, verbose=0, mode='min')
+    mcp_save_val_loss_min = ModelCheckpoint('val_loss_min.h5', save_best_only=True, save_weights_only=True, monitor='val_loss', mode='min')
+    mcp_save_loss_min = ModelCheckpoint('loss_min.h5', save_best_only=True, save_weights_only=True, monitor='loss', mode='min')
+    reduce_lr_loss = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50, verbose=1, mode='min')
 
-    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=1000, batch_size=64, callbacks=[mcp_save, reduce_lr_loss])
+    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=500, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, reduce_lr_loss])
 
     model.save_weights(NAME_BACKBONE+".h5", overwrite="True", save_format="h5", options=None)
 
