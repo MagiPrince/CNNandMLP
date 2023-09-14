@@ -32,33 +32,33 @@ def qresnetModelWithLocalization(num_objects):
     input1 = Input(shape=(64, 64, 3))
 
     # Initial convolution layer
-    x_1 = QConv2D(1, (7, 7), strides=(2, 2), padding='same', kernel_quantizer=quantized_bits(6), activation='quantized_relu(6)')(input1)
+    x = QConv2D(1, (7, 7), strides=(2, 2), padding='same', kernel_quantizer=quantized_bits(6), activation='quantized_relu(6)')(input1)
     # x = QBatchNormalization()(x)
     # x = QActivation('quantized_relu(6)')(x)
     # x = QAveragePooling2D((3, 3), strides=(2, 2))(x)
     
     # Residual blocks
-    # x = basic_block(x, 1)
-    # x = basic_block(x, 1)
-    # x = basic_block(x, 2, strides=(2, 2))
-    # x = basic_block(x, 2)
-    # x = basic_block(x, 4, strides=(2, 2))
-    # x = basic_block(x, 4)
-    # x = basic_block(x, 8, strides=(2, 2))
-    # x = basic_block(x, 8)
+    x = basic_block(x, 1)
+    x = basic_block(x, 1)
+    x = basic_block(x, 2, strides=(2, 2))
+    x = basic_block(x, 2)
+    x = basic_block(x, 4, strides=(2, 2))
+    x = basic_block(x, 4)
+    x = basic_block(x, 8, strides=(2, 2))
+    x = basic_block(x, 8)
 
-    x_2 = QConv2D(1, (3, 3), strides=(1, 1), padding='same', kernel_quantizer=quantized_bits(6), activation='quantized_relu(6)')(x_1)
-    # x = QActivation('quantized_relu(6)')(x)
-    x_3 = QConv2D(1, (3, 3), strides=(1, 1), padding='same', kernel_quantizer=quantized_bits(6), activation='quantized_relu(6)')(x_2)
-    # x = QActivation('quantized_relu(6)')(x)
-    x_4 = QConv2D(2, (3, 3), strides=(2, 2), padding='same', kernel_quantizer=quantized_bits(6), activation='quantized_relu(6)')(x_3)
-    # x = QActivation('quantized_relu(6)')(x)
-    x_5 = QConv2D(2, (3, 3), strides=(1, 1), padding='same', kernel_quantizer=quantized_bits(6), activation='quantized_relu(6)')(x_4)
-    # x = QActivation('quantized_relu(6)')(x)
+    # x_2 = QConv2D(1, (3, 3), strides=(1, 1), padding='same', kernel_quantizer=quantized_bits(6), activation='quantized_relu(6)')(x_1)
+    # # x = QActivation('quantized_relu(6)')(x)
+    # x_3 = QConv2D(1, (3, 3), strides=(1, 1), padding='same', kernel_quantizer=quantized_bits(6), activation='quantized_relu(6)')(x_2)
+    # # x = QActivation('quantized_relu(6)')(x)
+    # x_4 = QConv2D(2, (3, 3), strides=(2, 2), padding='same', kernel_quantizer=quantized_bits(6), activation='quantized_relu(6)')(x_3)
+    # # x = QActivation('quantized_relu(6)')(x)
+    # x_5 = QConv2D(2, (3, 3), strides=(1, 1), padding='same', kernel_quantizer=quantized_bits(6), activation='quantized_relu(6)')(x_4)
+    # # x = QActivation('quantized_relu(6)')(x)
 
     # x = MaxPooling2D()(x)
     
-    x_6 = Flatten()(x_5)
+    x = Flatten()(x)
 
     # x = Dense(32, activation='quantized_relu(6)')(x)
     
@@ -73,7 +73,7 @@ def qresnetModelWithLocalization(num_objects):
     #     concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
     # reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)
 
-    output = QDense(2, activation='quantized_relu(6)', kernel_quantizer=quantized_bits(6))(x_6) # Output : x, y
+    output = QDense(2, activation='quantized_relu(6)', kernel_quantizer=quantized_bits(6))(x) # Output : x, y
 
     # output = QDense(2, activation='relu', kernel_quantizer=quantized_bits(3),
     #     bias_quantizer=quantized_bits(3))(x)
