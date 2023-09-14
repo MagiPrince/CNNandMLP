@@ -41,16 +41,12 @@ def resnetModelWithLocalization(num_objects):
     x = basic_block(x, 2)
     x = basic_block(x, 4, strides=(2, 2))
     x = basic_block(x, 4)
-    x = basic_block(x, 8, strides=(2, 2))
-    x = basic_block(x, 8)
-    x = basic_block(x, 16, strides=(2, 2))
-    x = basic_block(x, 16)
-
-    # x = MaxPooling2D()(x)
+    # x = basic_block(x, 4, strides=(2, 2))
+    # x = basic_block(x, 4)
+    # x = basic_block(x, 8, strides=(2, 2))
+    # x = basic_block(x, 8)
     
     x = Flatten()(x)
-
-    # x = Dense(32, activation='relu')(x)
     
     outputs = []
     for _ in range(num_objects):
@@ -63,6 +59,8 @@ def resnetModelWithLocalization(num_objects):
     for output in outputs[1:]:
         concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
     reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)
+
+    # output = Dense(2, activation='relu')(x)
 
     # Create the model
     model = Model(inputs=input1, outputs=reshaped_outputs)

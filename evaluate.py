@@ -2,12 +2,13 @@ import tensorflow as tf
 from tensorflow import keras
 from model import customModelWithLocalization
 from resnet_and_mlp import resnetModelWithLocalization
+from qresnet_and_mlp import qresnetModelWithLocalization
 import numpy as np
 import os
 import sys
 import copy
 
-NAME_BACKBONE = "loss_min"
+NAME_BACKBONE = "val_accuracy_max"
 CONFIDENCE = 0.5
 IOU_THRESHOLD = 0.5
 
@@ -50,7 +51,7 @@ print("Nb images : " + str(len(images_test)))
 
 labels_test = np.load("labels_test.npy")[0]
 
-model = resnetModelWithLocalization(30)
+model = qresnetModelWithLocalization(30)
 
 if not os.path.isfile(NAME_BACKBONE+".h5"):
     sys.exit(1)

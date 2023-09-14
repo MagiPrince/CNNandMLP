@@ -1,5 +1,6 @@
 from model import customModelWithLocalization
 from resnet_and_mlp import resnetModelWithLocalization
+from qresnet_and_mlp import qresnetModelWithLocalization
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
@@ -14,7 +15,7 @@ images = np.load("matrices_training.npy")
 
 labels = np.load("labels_training.npy")
 
-model = resnetModelWithLocalization(30)
+model = qresnetModelWithLocalization(30)
 
 def coordinates_loss(y_true, y_pred):
     return tf.keras.losses.mean_squared_error(y_true[:, :, :4], y_pred[:, :, :4])
@@ -64,7 +65,7 @@ else:
     mcp_save_accuracy_max = ModelCheckpoint('accuracy_max.h5', save_best_only=True, save_weights_only=True, monitor='accuracy', mode='max')
     reduce_lr_loss = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=500, verbose=1, mode='min')
 
-    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=5000, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, mcp_save_val_accuracy_max, mcp_save_accuracy_max])
+    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=100, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, mcp_save_val_accuracy_max, mcp_save_accuracy_max])
 
     model.save_weights(NAME_BACKBONE+".h5", overwrite="True", save_format="h5", options=None)
 
