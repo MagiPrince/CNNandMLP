@@ -8,7 +8,7 @@ import os
 # os.environ['PATH'] += os.pathsep + '/tools/Xilinx/Vitis_HLS/2023.1/bin'
 os.environ['PATH'] += os.pathsep + "/tools/Xilinx/Vitis_HLS/2022.2/bin"
 
-model = qresnetModelWithLocalization(30)
+model = qresnetModelWithLocalization(2)
 
 model.summary()
 

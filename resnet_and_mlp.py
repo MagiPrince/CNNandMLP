@@ -5,7 +5,7 @@ from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, concatenat
 from keras.models import Model
 
 def basic_block(x, filters, strides=(1, 1)):
-    shortcut = x
+    # shortcut = x
     
     # First convolution layer
     x = Conv2D(filters, (3, 3), strides=strides, padding='same')(x)
@@ -41,28 +41,28 @@ def resnetModelWithLocalization(num_objects):
     x = basic_block(x, 2)
     x = basic_block(x, 4, strides=(2, 2))
     x = basic_block(x, 4)
-    # x = basic_block(x, 4, strides=(2, 2))
-    # x = basic_block(x, 4)
-    # x = basic_block(x, 8, strides=(2, 2))
-    # x = basic_block(x, 8)
+    x = basic_block(x, 4, strides=(2, 2))
+    x = basic_block(x, 4)
+    x = basic_block(x, 8, strides=(2, 2))
+    x = basic_block(x, 8)
     
     x = Flatten()(x)
     
-    outputs = []
-    for _ in range(num_objects):
-        output = Dense(2, activation='relu')(x)  # Output : x, y, w, h
-        # output = concatenate([output, Dense(1, activation='sigmoid')(x)], axis=1) # Output : x, y, w, h, confidence score
-        outputs.append(output)
+    # outputs = []
+    # for _ in range(num_objects):
+    #     output = Dense(2, activation='relu')(x)  # Output : x, y, w, h
+    #     # output = concatenate([output, Dense(1, activation='sigmoid')(x)], axis=1) # Output : x, y, w, h, confidence score
+    #     outputs.append(output)
 
-    # Concatenate outputs and reshape to [batch_size, num_objects, 5]
-    concatenated_outputs = outputs[0]
-    for output in outputs[1:]:
-        concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
-    reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)
+    # # Concatenate outputs and reshape to [batch_size, num_objects, 5]
+    # concatenated_outputs = outputs[0]
+    # for output in outputs[1:]:
+    #     concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
+    # reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)
 
-    # output = Dense(2, activation='relu')(x)
+    output = Dense(2, activation='relu')(x)
 
     # Create the model
-    model = Model(inputs=input1, outputs=reshaped_outputs)
+    model = Model(inputs=input1, outputs=output)
 
     return model
