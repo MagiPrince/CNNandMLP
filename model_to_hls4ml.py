@@ -1,14 +1,15 @@
 import hls4ml
 import tensorflow as tf
 import numpy as np
+from resnet_and_mlp import resnetModelWithLocalization
 from qresnet_and_mlp import qresnetModelWithLocalization
 import keras
 import os
 
-# os.environ['PATH'] += os.pathsep + '/tools/Xilinx/Vitis_HLS/2023.1/bin'
-os.environ['PATH'] += os.pathsep + "/tools/Xilinx/Vitis_HLS/2022.2/bin"
+os.environ['PATH'] += os.pathsep + '/tools/Xilinx/Vitis_HLS/2023.1/bin'
+# os.environ['PATH'] += os.pathsep + "/tools/Xilinx/Vitis_HLS/2022.2/bin"
 
-model = qresnetModelWithLocalization(2)
+model = resnetModelWithLocalization(5)
 
 model.summary()
 

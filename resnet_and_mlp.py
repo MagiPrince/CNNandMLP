@@ -31,38 +31,40 @@ def resnetModelWithLocalization(num_objects):
     input1 = Input(shape=(64, 64, 3))
 
     # Initial convolution layer
-    x = Conv2D(2, (7, 7), strides=(2, 2), padding='same')(input1)
+    x = Conv2D(64, (7, 7), strides=(2, 2), padding='same')(input1)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
-    x = MaxPooling2D((3, 3), strides=(2, 2))(x)
+    # x = MaxPooling2D((3, 3), strides=(2, 2))(x)
+    x = Conv2D(64, (3, 3), strides=(2, 2), padding='same')(x)
     
     # Residual blocks
-    x = basic_block(x, 2)
-    x = basic_block(x, 2)
-    x = basic_block(x, 4, strides=(2, 2))
-    x = basic_block(x, 4)
-    x = basic_block(x, 4, strides=(2, 2))
-    x = basic_block(x, 4)
-    x = basic_block(x, 8, strides=(2, 2))
-    x = basic_block(x, 8)
+    x = basic_block(x, 64)
+    x = basic_block(x, 64)
+    x = basic_block(x, 128, strides=(2, 2))
+    x = basic_block(x, 128)
+    x = basic_block(x, 256, strides=(2, 2))
+    x = basic_block(x, 256)
+    x = basic_block(x, 512, strides=(2, 2))
+    x = basic_block(x, 512)
     
     x = Flatten()(x)
     
-    # outputs = []
-    # for _ in range(num_objects):
-    #     output = Dense(2, activation='relu')(x)  # Output : x, y, w, h
-    #     # output = concatenate([output, Dense(1, activation='sigmoid')(x)], axis=1) # Output : x, y, w, h, confidence score
-    #     outputs.append(output)
+    outputs = []
+    for _ in range(num_objects):
+        output = Dense(2, activation='relu')(x)  # Output : x, y, w, h
+        # output = concatenate([output, Dense(1, activation='sigmoid')(x)], axis=1) # Output : x, y, w, h, confidence score
+        outputs.append(output)
+        x = Flatten()(x)
 
-    # # Concatenate outputs and reshape to [batch_size, num_objects, 5]
-    # concatenated_outputs = outputs[0]
-    # for output in outputs[1:]:
-    #     concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
-    # reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)
+    # Concatenate outputs and reshape to [batch_size, num_objects, 5]
+    concatenated_outputs = outputs[0]
+    for output in outputs[1:]:
+        concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
+    reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)
 
-    output = Dense(2, activation='relu')(x)
+    # output = Dense(2, activation='relu')(x)
 
     # Create the model
-    model = Model(inputs=input1, outputs=output)
+    model = Model(inputs=input1, outputs=reshaped_outputs)
 
     return model

@@ -51,7 +51,7 @@ print("Nb images : " + str(len(images_test)))
 
 labels_test = np.load("labels_test.npy")[0]
 
-model = qresnetModelWithLocalization(30)
+model = resnetModelWithLocalization(30)
 
 if not os.path.isfile(NAME_BACKBONE+".h5"):
     sys.exit(1)
