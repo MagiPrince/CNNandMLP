@@ -9,21 +9,33 @@ import os
 os.environ['PATH'] += os.pathsep + '/tools/Xilinx/Vitis_HLS/2023.1/bin'
 # os.environ['PATH'] += os.pathsep + "/tools/Xilinx/Vitis_HLS/2022.2/bin"
 
-model = resnetModelWithLocalization(5)
+model = qresnetModelWithLocalization(5)
 
 model.summary()
 
 config = hls4ml.utils.config_from_keras_model(model, granularity="name")
 
-print(config)
+# print(config)
 
 # Set the precision and reuse factor for the full model
 config['Model']['Precision'] = 'ap_fixed<16,6>'
 config['Model']['ReuseFactor'] = 1
 
-for Layer in config['LayerName'].keys():
-    config['LayerName'][Layer]['Strategy'] = 'Latency'
-    config['LayerName'][Layer]['ReuseFactor'] = 1
+for layer in config['LayerName'].keys():
+    config['LayerName'][layer]['Strategy'] = 'latency'
+    config['LayerName'][layer]['ReuseFactor'] = 64
+
+for layer in model.layers:
+    if layer.__class__.__name__ in ['QConv2D', 'QDense']:
+        w = layer.get_weights()[0]
+        layersize = np.prod(w.shape)
+        # print("{}: {}".format(layer.name, layersize))  # 0 = weights, 1 = biases
+        if layersize > 4096:  # assuming that shape[0] is batch, i.e., 'None'
+            print("Layer {} is too large ({}), are you sure you want to train?".format(layer.name, layersize))
+            config['LayerName'][layer.name]['Strategy'] = 'ressource'
+    # elif layer.__class__.__name__ in ["Flatten", "Concatenate"]:
+    #         print(layer.name)
+    #         config['LayerName'][layer.name]['Strategy'] = 'ressource'
 
 # config['LayerName']['output_softmax']['Strategy'] = 'Stable'
 

@@ -31,21 +31,21 @@ def resnetModelWithLocalization(num_objects):
     input1 = Input(shape=(64, 64, 3))
 
     # Initial convolution layer
-    x = Conv2D(64, (7, 7), strides=(2, 2), padding='same')(input1)
+    x = Conv2D(1, (7, 7), strides=(2, 2), padding='same')(input1)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
-    # x = MaxPooling2D((3, 3), strides=(2, 2))(x)
-    x = Conv2D(64, (3, 3), strides=(2, 2), padding='same')(x)
+    x = MaxPooling2D((3, 3))(x)
+    # x = Conv2D(1, (3, 3), strides=(2, 2), padding='same')(x)
     
     # Residual blocks
-    x = basic_block(x, 64)
-    x = basic_block(x, 64)
-    x = basic_block(x, 128, strides=(2, 2))
-    x = basic_block(x, 128)
-    x = basic_block(x, 256, strides=(2, 2))
-    x = basic_block(x, 256)
-    x = basic_block(x, 512, strides=(2, 2))
-    x = basic_block(x, 512)
+    x = basic_block(x, 1)
+    x = basic_block(x, 1)
+    x = basic_block(x, 2, strides=(2, 2))
+    x = basic_block(x, 2)
+    x = basic_block(x, 4, strides=(2, 2))
+    x = basic_block(x, 4)
+    x = basic_block(x, 8, strides=(2, 2))
+    x = basic_block(x, 8)
     
     x = Flatten()(x)
     

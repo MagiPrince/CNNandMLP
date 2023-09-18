@@ -7,6 +7,7 @@ import numpy as np
 import os
 from matplotlib import pyplot as plt
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from keras.optimizers import Adam
 
 NAME_BACKBONE = "cnn_and_mlp"
 TRAIN = True
@@ -15,7 +16,7 @@ images = np.load("matrices_training.npy")
 
 labels = np.load("labels_training.npy")
 
-model = resnetModelWithLocalization(30)
+model = qresnetModelWithLocalization(30)
 
 def coordinates_loss(y_true, y_pred):
     return tf.keras.losses.mean_squared_error(y_true[:, :, :4], y_pred[:, :, :4])
@@ -24,7 +25,7 @@ def confidence_loss(y_true, y_pred):
     return tf.keras.losses.binary_crossentropy(y_true[:, :, 4:], y_pred[:, :, 4:])
 
 # Compile the model with separate loss functions for each output
-model.compile(optimizer='adam', loss=[coordinates_loss, confidence_loss], metrics=['accuracy'])
+# model.compile(optimizer='adam', loss=[coordinates_loss, confidence_loss], metrics=['accuracy'])
 
 if os.path.isfile(NAME_BACKBONE+".h5") and not TRAIN:
 
@@ -47,7 +48,7 @@ if os.path.isfile(NAME_BACKBONE+".h5") and not TRAIN:
 
 else:
     # Train model
-    model.compile(optimizer='adam', loss="mean_squared_error", metrics=['accuracy'])
+    model.compile(optimizer=Adam(), loss="mean_squared_error", metrics=['accuracy'])
 
     labels = labels[:,:,:2]
 
