@@ -9,7 +9,7 @@ import os
 os.environ['PATH'] += os.pathsep + '/tools/Xilinx/Vitis_HLS/2023.1/bin'
 # os.environ['PATH'] += os.pathsep + "/tools/Xilinx/Vitis_HLS/2022.2/bin"
 
-model = qresnetModelWithLocalization(5)
+model = qresnetModelWithLocalization(2)
 
 model.summary()
 
@@ -18,24 +18,30 @@ config = hls4ml.utils.config_from_keras_model(model, granularity="name")
 # print(config)
 
 # Set the precision and reuse factor for the full model
+# config['Model']['Precision'] = 'ap_ufixed<8,6>'
 config['Model']['Precision'] = 'ap_fixed<16,6>'
-config['Model']['ReuseFactor'] = 1
+config['Model']['ReuseFactor'] = 4000
+config['Model']['Strategy'] = 'Resource'
 
 for layer in config['LayerName'].keys():
-    config['LayerName'][layer]['Strategy'] = 'latency'
-    config['LayerName'][layer]['ReuseFactor'] = 64
+    print(layer)
+    # config['LayerName'][layer]['Strategy'] = 'latency'
+    config['LayerName'][layer]['Strategy'] = 'Resource'
+    config['LayerName'][layer]['ReuseFactor'] = 4000
 
-for layer in model.layers:
-    if layer.__class__.__name__ in ['QConv2D', 'QDense']:
-        w = layer.get_weights()[0]
-        layersize = np.prod(w.shape)
-        # print("{}: {}".format(layer.name, layersize))  # 0 = weights, 1 = biases
-        if layersize > 4096:  # assuming that shape[0] is batch, i.e., 'None'
-            print("Layer {} is too large ({}), are you sure you want to train?".format(layer.name, layersize))
-            config['LayerName'][layer.name]['Strategy'] = 'ressource'
-    # elif layer.__class__.__name__ in ["Flatten", "Concatenate"]:
+# for layer in model.layers:
+#     if layer.__class__.__name__ in ['QConv2D', 'QDense']:
+#         w = layer.get_weights()[0]
+#         layersize = np.prod(w.shape)
+#         # print("{}: {}".format(layer.name, layersize))  # 0 = weights, 1 = biases
+#         if layersize > 4096:  # assuming that shape[0] is batch, i.e., 'None'
+#             print("Layer {} is too large ({}), are you sure you want to train?".format(layer.name, layersize))
+#             # config['LayerName'][layer.name]['Strategy'] = 'resource'
+#         else:
+#             config['LayerName'][layer.name]['Strategy'] = 'latency'
+    # elif layer.__class__.__name__ in ["Reshape", "Concatenate"]:
     #         print(layer.name)
-    #         config['LayerName'][layer.name]['Strategy'] = 'ressource'
+    #         config['LayerName'][layer.name]['Strategy'] = 'resource'
 
 # config['LayerName']['output_softmax']['Strategy'] = 'Stable'
 
@@ -59,6 +65,12 @@ cfg['HLSConfig'] = config
 cfg['KerasModel'] = model
 cfg['OutputDir'] = 'model_1/'
 cfg['Part'] = 'xc7z030sbv485-3'
+cfg['Interface'] = 'axi_stream'
+
+print("-----------------------------------")
+print("Configuration")
+print(cfg)
+print("-----------------------------------")
 
 hls_model = hls4ml.converters.keras_to_hls(cfg)
 

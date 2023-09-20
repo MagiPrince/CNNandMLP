@@ -49,17 +49,18 @@ def resnetModelWithLocalization(num_objects):
     
     x = Flatten()(x)
     
-    outputs = []
-    for _ in range(num_objects):
+    # outputs = []
+    concatenated_outputs = Dense(2, activation='relu')(x)
+    for _ in range(num_objects-1):
         output = Dense(2, activation='relu')(x)  # Output : x, y, w, h
         # output = concatenate([output, Dense(1, activation='sigmoid')(x)], axis=1) # Output : x, y, w, h, confidence score
-        outputs.append(output)
-        x = Flatten()(x)
+        concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
+    #     x = Flatten()(x)
 
     # Concatenate outputs and reshape to [batch_size, num_objects, 5]
-    concatenated_outputs = outputs[0]
-    for output in outputs[1:]:
-        concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
+    # concatenated_outputs = outputs[0]
+    # for output in outputs[1:]:
+    #     concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
     reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)
 
     # output = Dense(2, activation='relu')(x)
