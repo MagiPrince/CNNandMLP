@@ -6,16 +6,7 @@ from keras.models import Model
 from qkeras import *
 import contextlib
 
-bits = 8
-
-@contextlib.contextmanager
-def options(options):
-  old_opts = tf.config.optimizer.get_experimental_options()
-  tf.config.optimizer.set_experimental_options(options)
-  try:
-    yield
-  finally:
-    tf.config.optimizer.set_experimental_options(old_opts)
+bits = 16
 
 def basic_block(x, filters, strides=(1, 1)):
     # shortcut = x
@@ -46,12 +37,11 @@ def basic_block(x, filters, strides=(1, 1)):
     return x
 
 def qresnetModelWithLocalization(num_objects):
-    # with options({"layout_optimizer": False}):
     # Input layer
     input1 = Input(shape=(64, 64, 3))
 
     # Initial convolution layer
-    x = QConv2D(4, (7, 7), strides=(2, 2), padding='same',
+    x = QConv2D(64, (7, 7), strides=(2, 2), padding='same',
                 kernel_quantizer=quantized_bits(bits, 6, alpha=1),
                 bias_quantizer=quantized_bits(bits, 6, alpha=1),
                 kernel_initializer='lecun_uniform', use_bias=True)(input1)
@@ -60,17 +50,21 @@ def qresnetModelWithLocalization(num_objects):
     # x = MaxPooling2D((3, 3))(x)
     # x = Conv2D(1, (3, 3), strides=(2, 2), padding='same')(x)
     
+    
     # Residual blocks
-    x = basic_block(x, 4)
-    x = basic_block(x, 4)
-    x = basic_block(x, 8, strides=(2, 2))
-    x = basic_block(x, 8)
-    x = basic_block(x, 16, strides=(2, 2))
-    x = basic_block(x, 16)
-    x = basic_block(x, 32, strides=(2, 2))
-    x = basic_block(x, 32)
+    x = basic_block(x, 64)
+    x = basic_block(x, 64)
+    x = basic_block(x, 128, strides=(2, 2))
+    x = basic_block(x, 128)
+    x = basic_block(x, 256, strides=(2, 2))
+    x = basic_block(x, 256)
+    x = basic_block(x, 512, strides=(2, 2))
+    x = basic_block(x, 512)
 
-    print(x.shape)
+    x = QConv2D(512, (4, 4), padding='same',
+                kernel_quantizer=quantized_bits(bits, 6, alpha=1),
+                bias_quantizer=quantized_bits(bits, 6, alpha=1),
+                kernel_initializer='lecun_uniform', use_bias=True)(x)
     
     x = Flatten()(x)
     
@@ -84,7 +78,6 @@ def qresnetModelWithLocalization(num_objects):
                         kernel_initializer='lecun_uniform', use_bias=True)(x) # Output : x, y
         output = QActivation(quantized_relu(bits, 6))(output_tmp)
         concatenated_outputs = Concatenate(axis=-1)([concatenated_outputs, output])
-        print(concatenated_outputs.shape)
 
 
     reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)

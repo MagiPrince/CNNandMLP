@@ -8,7 +8,7 @@ import os
 import sys
 import copy
 
-NAME_BACKBONE = "val_accuracy_max"
+NAME_BACKBONE = "cnn_and_malp"
 CONFIDENCE = 0.5
 IOU_THRESHOLD = 0.5
 
