@@ -28,8 +28,11 @@ def basic_block(x, filters, strides=(1, 1)):
     
     # Shortcut connection
     # if strides != (1, 1) or shortcut.shape[-1] != filters:
-    #     shortcut = Conv2D(filters, (1, 1), strides=strides, padding='same')(shortcut)
-    #     shortcut = BatchNormalization()(shortcut)
+    #     shortcut = QConv2D(filters, (1, 1), strides=strides, padding='same',
+    #             kernel_quantizer=quantized_bits(bits, 6, alpha=1),
+    #             bias_quantizer=quantized_bits(bits, 6, alpha=1),
+    #             kernel_initializer='he_normal', use_bias=True)(shortcut)
+    #     shortcut = QBatchNormalization()(shortcut)
     
     # x = Add()([x, shortcut])
     x = QActivation(quantized_relu(bits, 6))(x)
