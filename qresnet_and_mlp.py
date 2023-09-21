@@ -15,7 +15,7 @@ def basic_block(x, filters, strides=(1, 1)):
     x = QConv2D(filters, (3, 3), strides=strides, padding='same',
                 kernel_quantizer=quantized_bits(bits, 6, alpha=1),
                 bias_quantizer=quantized_bits(bits, 6, alpha=1),
-                kernel_initializer='lecun_uniform', use_bias=True)(x)
+                kernel_initializer='he_normal', use_bias=True)(x)
     x = QBatchNormalization()(x)
     x = QActivation(quantized_relu(bits, 6))(x)
     
@@ -23,7 +23,7 @@ def basic_block(x, filters, strides=(1, 1)):
     x = QConv2D(filters, (3, 3), strides=(1, 1), padding='same',
                 kernel_quantizer=quantized_bits(bits, 6, alpha=1),
                 bias_quantizer=quantized_bits(bits, 6, alpha=1),
-                kernel_initializer='lecun_uniform', use_bias=True)(x)
+                kernel_initializer='he_normal', use_bias=True)(x)
     x = QBatchNormalization()(x)
     
     # Shortcut connection
@@ -44,12 +44,17 @@ def qresnetModelWithLocalization(num_objects):
     x = QConv2D(64, (7, 7), strides=(2, 2), padding='same',
                 kernel_quantizer=quantized_bits(bits, 6, alpha=1),
                 bias_quantizer=quantized_bits(bits, 6, alpha=1),
-                kernel_initializer='lecun_uniform', use_bias=True)(input1)
+                kernel_initializer='he_normal', use_bias=True)(input1)
+    x = QBatchNormalization()(x)
+    x = QActivation(quantized_relu(bits, 6))(x)
+    x = QConv2D(64, (3, 3), strides=(3, 3), padding='same',
+                kernel_quantizer=quantized_bits(bits, 6, alpha=1),
+                bias_quantizer=quantized_bits(bits, 6, alpha=1),
+                kernel_initializer='he_normal', use_bias=True)(x)
     x = QBatchNormalization()(x)
     x = QActivation(quantized_relu(bits, 6))(x)
     # x = MaxPooling2D((3, 3))(x)
     # x = Conv2D(1, (3, 3), strides=(2, 2), padding='same')(x)
-    
     
     # Residual blocks
     x = basic_block(x, 64)
@@ -60,22 +65,17 @@ def qresnetModelWithLocalization(num_objects):
     x = basic_block(x, 256)
     x = basic_block(x, 512, strides=(2, 2))
     x = basic_block(x, 512)
-
-    x = QConv2D(512, (4, 4), padding='same',
-                kernel_quantizer=quantized_bits(bits, 6, alpha=1),
-                bias_quantizer=quantized_bits(bits, 6, alpha=1),
-                kernel_initializer='lecun_uniform', use_bias=True)(x)
     
     x = Flatten()(x)
     
     output_1 = QDense(2, kernel_quantizer= quantized_bits(bits, 0, alpha=1),
                         bias_quantizer=quantized_bits(bits, 0, alpha=1),
-                        kernel_initializer='lecun_uniform', use_bias=True)(x) # Output : x, y
+                        kernel_initializer='he_normal', use_bias=True)(x) # Output : x, y
     concatenated_outputs = QActivation(quantized_relu(bits, 6))(output_1)
     for _ in range(num_objects-1):
         output_tmp = QDense(2, kernel_quantizer= quantized_bits(bits, 0, alpha=1),
                         bias_quantizer=quantized_bits(bits, 0, alpha=1),
-                        kernel_initializer='lecun_uniform', use_bias=True)(x) # Output : x, y
+                        kernel_initializer='he_normal', use_bias=True)(x) # Output : x, y
         output = QActivation(quantized_relu(bits, 6))(output_tmp)
         concatenated_outputs = Concatenate(axis=-1)([concatenated_outputs, output])
 
