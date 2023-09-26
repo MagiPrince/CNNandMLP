@@ -16,7 +16,7 @@ images = np.load("matrices_training.npy")
 
 labels = np.load("labels_training.npy")
 
-model = qresnetModelWithLocalization(30)
+model = qresnetModelWithLocalization(14)
 
 def coordinates_loss(y_true, y_pred):
     return tf.keras.losses.mean_squared_error(y_true[:, :, :4], y_pred[:, :, :4])
@@ -50,12 +50,12 @@ else:
     # Train model
     model.compile(optimizer=Adam(), loss="mean_squared_error", metrics=['accuracy'])
 
-    labels = labels[:,:,:2]
+    labels = labels[:,:14,:2]
 
     images_validation = np.load("matrices_validation.npy")
 
     labels_validation = np.load("labels_validation.npy")
-    labels_validation = labels_validation[:,:,:2]
+    labels_validation = labels_validation[:,:14,:2]
 
     # model.summary()
 
@@ -66,7 +66,7 @@ else:
     mcp_save_accuracy_max = ModelCheckpoint('accuracy_max.h5', save_best_only=True, save_weights_only=True, monitor='accuracy', mode='max')
     reduce_lr_loss = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=500, verbose=1, mode='min')
 
-    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=300, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, mcp_save_val_accuracy_max, mcp_save_accuracy_max])
+    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=500, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, mcp_save_val_accuracy_max, mcp_save_accuracy_max])
 
     model.save_weights(NAME_BACKBONE+".h5", overwrite="True", save_format="h5", options=None)
 

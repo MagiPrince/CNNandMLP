@@ -33,6 +33,8 @@ labels_test = []
 dir_files_jet = os.listdir(path_jet)
 dir_files_jet = sorted(dir_files_jet)
 
+array_nb_elements = np.zeros(30)
+
 for folder_element, jet_file in enumerate(dir_files_jet):
 
     f = h5py.File(os.path.join(path_jet, jet_file), "r")
@@ -56,7 +58,6 @@ for folder_element, jet_file in enumerate(dir_files_jet):
     ########################################################################
     # Transform data
     ########################################################################
-
     for i in range(len(data_jet)):
         print("--------------------- data_jet " + str(i) + " ---------------------")
         df_jet = pd.DataFrame(data_jet[i],  columns=list(dict_data_jet.keys()))
@@ -67,7 +68,7 @@ for folder_element, jet_file in enumerate(dir_files_jet):
 
         tmp_labels = []
         # print(len(df_jet['eta_rounded']))
-
+        cnt = 0
         for j in range(len(df_jet['eta_rounded'])):
             label = [55, 32, 0, 0, 0]
             # Check if the value is not a NaN
@@ -80,9 +81,11 @@ for folder_element, jet_file in enumerate(dir_files_jet):
                     y = round((df_jet['phi_rounded'].iloc[j] + PHI) / (PHI*2) * (LEN_PHI-1)) #/ LEN_PHI
 
                     label = [x, y, 10, 10, 1]
+                    cnt+=1
 
             tmp_labels.append(label)
 
+        array_nb_elements[cnt] += 1
         # sort labels by x coordinate
         tmp_labels = sorted(tmp_labels, key=lambda x: x[0], reverse=False)
 
@@ -105,6 +108,8 @@ for folder_element, jet_file in enumerate(dir_files_jet):
     # if folder_element+1 >= 4:
     #     break
 
-np.save("labels_training.npy", np.array(labels_training))
-np.save("labels_validation.npy", np.array(labels_validation))
-np.save("labels_test.npy", np.array(labels_test))
+print(array_nb_elements)
+
+# np.save("labels_training.npy", np.array(labels_training))
+# np.save("labels_validation.npy", np.array(labels_validation))
+# np.save("labels_test.npy", np.array(labels_test))

@@ -1,4 +1,4 @@
 env
-model_1
+model_*
 __pycache__
 *.h5
