@@ -46,6 +46,8 @@ def resnetModelWithLocalization(num_objects):
     x = basic_block(x, 256)
     x = basic_block(x, 512, strides=(2, 2))
     x = basic_block(x, 512)
+
+    # x = GlobalAveragePooling2D()(x)
     
     x = Flatten()(x)
     

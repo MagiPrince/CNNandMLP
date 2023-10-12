@@ -9,14 +9,14 @@ from matplotlib import pyplot as plt
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from keras.optimizers import Adam
 
-NAME_BACKBONE = "cnn_and_mlp_4_n_neurons"
+NAME_BACKBONE = "cnn_and_mlp"
 TRAIN = True
 
 images = np.load("matrices_training.npy")
 
-labels = np.load("labels_training_4_n_neurons.npy")
+labels = np.load("labels_training.npy")
 
-model = resnetModelWithLocalization(16)
+model = resnetModelWithLocalization(30)
 
 def coordinates_loss(y_true, y_pred):
     return tf.keras.losses.mean_squared_error(y_true[:, :, :4], y_pred[:, :, :4])
@@ -31,7 +31,7 @@ if os.path.isfile(NAME_BACKBONE+".h5") and not TRAIN:
 
     images_test = np.load("matrices_test.npy")
 
-    labels_test = np.load("labels_test_4_n_neurons.npy")[0]
+    labels_test = np.load("labels_test.npy")[0]
 
     model.load_weights(NAME_BACKBONE+".h5", skip_mismatch=False, by_name=False, options=None)
 
@@ -54,16 +54,16 @@ else:
 
     images_validation = np.load("matrices_validation.npy")
 
-    labels_validation = np.load("labels_validation_4_n_neurons.npy")
+    labels_validation = np.load("labels_validation.npy")
     labels_validation = labels_validation[:,:,:2]
 
     # model.summary()
 
     earlyStopping = EarlyStopping(monitor='loss', patience=400, verbose=0, mode='min')
-    mcp_save_val_loss_min = ModelCheckpoint('val_loss_min_4_n_neurons.h5', save_best_only=True, save_weights_only=True, monitor='val_loss', mode='min')
-    mcp_save_loss_min = ModelCheckpoint('loss_min_4_n_neurons.h5', save_best_only=True, save_weights_only=True, monitor='loss', mode='min')
-    mcp_save_val_accuracy_max = ModelCheckpoint('val_accuracy_max_4_n_neurons.h5', save_best_only=True, save_weights_only=True, monitor='val_accuracy', mode='max')
-    mcp_save_accuracy_max = ModelCheckpoint('accuracy_max_4_n_neurons.h5', save_best_only=True, save_weights_only=True, monitor='accuracy', mode='max')
+    mcp_save_val_loss_min = ModelCheckpoint('val_loss_min.h5', save_best_only=True, save_weights_only=True, monitor='val_loss', mode='min')
+    mcp_save_loss_min = ModelCheckpoint('loss_min.h5', save_best_only=True, save_weights_only=True, monitor='loss', mode='min')
+    mcp_save_val_accuracy_max = ModelCheckpoint('val_accuracy_max.h5', save_best_only=True, save_weights_only=True, monitor='val_accuracy', mode='max')
+    mcp_save_accuracy_max = ModelCheckpoint('accuracy_max.h5', save_best_only=True, save_weights_only=True, monitor='accuracy', mode='max')
     reduce_lr_loss = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=500, verbose=1, mode='min')
 
     model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=300, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, mcp_save_val_accuracy_max, mcp_save_accuracy_max, reduce_lr_loss])

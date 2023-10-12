@@ -8,17 +8,15 @@ import os
 import sys
 import matplotlib.pyplot as plt
 
-NAME_BACKBONE = "cnn_and_mlp_4_n_neurons"
+NAME_BACKBONE = "val_accuracy_max_4_n_neurons"
 CONFIDENCE = 0.5
 IOU_THRESHOLD = 0.5
-NEURONS = 16
+NEURONS = 64
 
 
 images_test = np.load("matrices_test.npy")
 
 print("Nb images : " + str(len(images_test)))
-
-labels_test = np.load("labels_test.npy")[0]
 
 model = resnetModelWithLocalization(NEURONS)
 
