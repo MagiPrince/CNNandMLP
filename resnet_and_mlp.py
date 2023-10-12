@@ -46,12 +46,6 @@ def resnetModelWithLocalization(num_objects):
     x = basic_block(x, 256)
     x = basic_block(x, 512, strides=(2, 2))
     x = basic_block(x, 512)
-
-    print(x.shape)
-
-    x = Conv2D(512, (2, 2), padding='same')(x)
-
-    print(x.shape)
     
     x = Flatten()(x)
     

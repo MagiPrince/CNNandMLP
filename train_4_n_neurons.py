@@ -50,12 +50,9 @@ else:
     # Train model
     model.compile(optimizer=Adam(), loss="mean_squared_error", metrics=['accuracy'])
 
-    labels = labels[:,:,:2]
-
     images_validation = np.load("matrices_validation.npy")
 
     labels_validation = np.load("labels_validation_4_n_neurons.npy")
-    labels_validation = labels_validation[:,:,:2]
 
     # model.summary()
 

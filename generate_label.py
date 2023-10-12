@@ -59,7 +59,7 @@ for folder_element, jet_file in enumerate(dir_files_jet):
     # Transform data
     ########################################################################
     for i in range(len(data_jet)):
-        print("--------------------- data_jet " + str(i) + " ---------------------")
+        # print("--------------------- data_jet " + str(i) + " ---------------------")
         df_jet = pd.DataFrame(data_jet[i],  columns=list(dict_data_jet.keys()))
 
         df_jet['eta_rounded'] = df_jet['AntiKt4EMTopoJets_eta'].apply(lambda x : round(x*10)/10 if x == x else x)
@@ -107,8 +107,10 @@ for folder_element, jet_file in enumerate(dir_files_jet):
 
     # if folder_element+1 >= 4:
     #     break
+    break
 
-print(array_nb_elements)
+print(np.array(labels_training).shape)
+print(np.array(labels_validation).shape)
 
 # np.save("labels_training.npy", np.array(labels_training))
 # np.save("labels_validation.npy", np.array(labels_validation))
