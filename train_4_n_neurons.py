@@ -16,7 +16,7 @@ images = np.load("matrices_training.npy")
 
 labels = np.load("labels_training_4_n_neurons.npy")
 
-model = resnetModelWithLocalization(64)
+model = qresnetModelWithLocalization(64)
 
 def coordinates_loss(y_true, y_pred):
     return tf.keras.losses.mean_squared_error(y_true[:, :, :2], y_pred[:, :, :2])
