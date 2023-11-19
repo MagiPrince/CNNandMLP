@@ -40,7 +40,7 @@ def flatten_3d_array(matrix_of_closest_jet_coordinates):
     flattened_array = []
     for i in range(round(NB_NEURON_BY_SIDE)):
         for j in range(round(NB_NEURON_BY_SIDE)):
-            flattened_array.append([round(matrix_of_closest_jet_coordinates[i][j][0]), round(matrix_of_closest_jet_coordinates[i][j][1])])#, matrix_of_closest_jet_coordinates[i][j][-1]])
+            flattened_array.append([round(matrix_of_closest_jet_coordinates[i][j][0]), round(matrix_of_closest_jet_coordinates[i][j][1]), matrix_of_closest_jet_coordinates[i][j][-1]])
 
     return flattened_array
 
@@ -108,7 +108,7 @@ for folder_element, jet_file in enumerate(dir_files_jet):
         cnt = 0
         # Create a matrix that will contain the position of the jet that each neuron should detect
         array = np.concatenate((matrix_of_centers, np.zeros((round(NB_NEURON_BY_SIDE), round(NB_NEURON_BY_SIDE), 1))), axis=-1)
-        matrix_of_closest_jet_coordinates = np.ones((round(NB_NEURON_BY_SIDE), round(NB_NEURON_BY_SIDE), 3)) * [55, 32, 0]
+        matrix_of_closest_jet_coordinates = np.c_[copy.deepcopy(matrix_of_centers), np.zeros((len(matrix_of_centers), len(matrix_of_centers), 1), dtype=matrix_of_centers.dtype)]# np.ones((round(NB_NEURON_BY_SIDE), round(NB_NEURON_BY_SIDE), 3)) * [55, 32, 0]
         
         for j in range(len(df_jet['eta_rounded'])):
             # label = [55, 32, 0, 0, 0]

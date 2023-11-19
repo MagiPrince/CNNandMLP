@@ -16,13 +16,23 @@ images = np.load("matrices_training.npy")
 
 labels = np.load("labels_training_4_n_neurons.npy")
 
-model = qresnetModelWithLocalization(64)
+model = resnetModelWithLocalization(64)
 
 def coordinates_loss(y_true, y_pred):
     return tf.keras.losses.mean_squared_error(y_true[:, :, :2], y_pred[:, :, :2])
 
 def confidence_loss(y_true, y_pred):
     return tf.keras.losses.binary_crossentropy(y_true[:, :, 2:], y_pred[:, :, 2:])
+
+def custom_loss(y_true, y_pred):
+    # Coordinates loss
+    coords_loss = tf.keras.losses.mean_squared_error(y_true[:, :, :2], y_pred[:, :, :2])
+    
+    # Confidence loss
+    confidence_loss = tf.keras.losses.binary_crossentropy(y_true[:, :, 2:], y_pred[:, :, 2:])
+    
+    # Combine both losses
+    return coords_loss + confidence_loss
 
 # Compile the model with separate loss functions for each output
 # model.compile(optimizer='adam', loss=[coordinates_loss, confidence_loss], metrics=['accuracy'])
@@ -48,8 +58,8 @@ if os.path.isfile(NAME_BACKBONE+".h5") and not TRAIN:
 
 else:
     # Train model
-    model.compile(optimizer=Adam(), loss="mean_squared_error", metrics=['accuracy'])
-    # model.compile(optimizer='adam', loss=[coordinates_loss, confidence_loss], metrics=['accuracy'])
+    # model.compile(optimizer=Adam(), loss="mean_squared_error", metrics=['accuracy'])
+    model.compile(optimizer=Adam(), loss=custom_loss, metrics=['accuracy'])
 
     images_validation = np.load("matrices_validation.npy")
 
@@ -64,7 +74,7 @@ else:
     mcp_save_accuracy_max = ModelCheckpoint('accuracy_max_4_n_neurons.h5', save_best_only=True, save_weights_only=True, monitor='accuracy', mode='max')
     reduce_lr_loss = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=500, verbose=1, mode='min')
 
-    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=500, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, mcp_save_val_accuracy_max, mcp_save_accuracy_max, reduce_lr_loss])
+    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=100, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, mcp_save_val_accuracy_max, mcp_save_accuracy_max, reduce_lr_loss])
 
     model.save_weights(NAME_BACKBONE+".h5", overwrite="True", save_format="h5", options=None)
 

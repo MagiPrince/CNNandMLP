@@ -50,6 +50,10 @@ matrices_test = []
 dir_files = os.listdir(path_calocell)
 dir_files = sorted(dir_files)
 
+# Compute the len of phi and eta based on a given granularity
+len_phi = len(np.arange(start=-3.15, stop=3.15+GRANULARITY, step=GRANULARITY))
+len_eta = len(np.arange(start=-2.4, stop=2.4+GRANULARITY, step=GRANULARITY))
+
 for folder_element, calocell_file in enumerate(dir_files):
 
     f = h5py.File(os.path.join(path_calocell, calocell_file), "r")
@@ -74,11 +78,8 @@ for folder_element, calocell_file in enumerate(dir_files):
 
         df_calo['cell_phi_rounded'] = df_calo['cell_phi'].apply(lambda x : round(x*40)/40)
         
-        len_phi = len(np.arange(start=-3.15, stop=3.15+GRANULARITY, step=GRANULARITY))
-        len_eta = len(np.arange(start=-2.4, stop=2.4+GRANULARITY, step=GRANULARITY))
+        
         matrix = np.zeros((3, SIZE_FINAL_MATRIX, SIZE_FINAL_MATRIX))
-
-        df_max = df_calo['cell_EoverSigma'].max()
 
         for j in range(len(df_calo['cell_eta'])):
             if np.absolute(df_calo['cell_eta'].iloc[j]) <= 2.4:

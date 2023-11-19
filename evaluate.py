@@ -7,8 +7,9 @@ import numpy as np
 import os
 import sys
 import copy
+import random
 
-NAME_BACKBONE = "cnn_and_mlp_4_n_neurons"
+NAME_BACKBONE = "cnn_and_mlp"
 CONFIDENCE = 0.5
 IOU_THRESHOLD = 0.5
 
@@ -51,7 +52,7 @@ print("Nb images : " + str(len(images_test)))
 
 labels_test = np.load("labels_test.npy")[0]
 
-model = resnetModelWithLocalization(16)
+model = resnetModelWithLocalization(30)
 
 if not os.path.isfile(NAME_BACKBONE+".h5"):
     sys.exit(1)
@@ -75,11 +76,11 @@ for i in range(len(results)):
 
     coord_gt = []
     for j in range(30):
-        if labels_test[i][j][0] < 45 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5:
+        if labels_test[i][j][0] < 48 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5:
             coord_gt.append(copy.deepcopy(labels_test[i][j][:2].tolist()))
 
     for j in range(len(results[i])):
-        if results[i][j][0] < 45 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59:# and results[i][j][-1] > CONFIDENCE:
+        if results[i][j][0] < 48 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59 and results[i][j][-1] > CONFIDENCE:
             detection_in_range += 1
             index_iou = -1
             best_iou = -1

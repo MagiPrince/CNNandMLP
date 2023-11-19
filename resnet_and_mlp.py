@@ -5,7 +5,7 @@ from keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense, concatenat
 from keras.models import Model
 
 def basic_block(x, filters, strides=(1, 1)):
-    # shortcut = x
+    shortcut = x
     
     # First convolution layer
     x = Conv2D(filters, (3, 3), strides=strides, padding='same')(x)
@@ -17,11 +17,11 @@ def basic_block(x, filters, strides=(1, 1)):
     x = BatchNormalization()(x)
     
     # Shortcut connection
-    # if strides != (1, 1) or shortcut.shape[-1] != filters:
-    #     shortcut = Conv2D(filters, (1, 1), strides=strides, padding='same')(shortcut)
-    #     shortcut = BatchNormalization()(shortcut)
+    if strides != (1, 1) or shortcut.shape[-1] != filters:
+        shortcut = Conv2D(filters, (1, 1), strides=strides, padding='same')(shortcut)
+        shortcut = BatchNormalization()(shortcut)
     
-    # x = Add()([x, shortcut])
+    x = Add()([x, shortcut])
     x = Activation('relu')(x)
     
     return x
@@ -35,7 +35,6 @@ def resnetModelWithLocalization(num_objects):
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
     x = MaxPooling2D((3, 3))(x)
-    # x = Conv2D(1, (3, 3), strides=(2, 2), padding='same')(x)
     
     # Residual blocks
     x = basic_block(x, 64)
@@ -47,17 +46,21 @@ def resnetModelWithLocalization(num_objects):
     x = basic_block(x, 512, strides=(2, 2))
     x = basic_block(x, 512)
 
-    # x = GlobalAveragePooling2D()(x)
+    x = GlobalAveragePooling2D()(x)
     
     x = Flatten()(x)
     
     # outputs = []
-    concatenated_outputs = Dense(2, activation='relu')(x)
+    output_coords = Dense(2, activation='relu')(x)  # Output : x, y
+    output_confidence = Dense(1, activation='sigmoid')(x)
+    concatenated_outputs = concatenate([output_coords, output_confidence], axis=1)
     for _ in range(num_objects-1):
-        output = Dense(2, activation='relu')(x)  # Output : x, y
+        output_coords = Dense(2, activation='relu')(x)  # Output : x, y
+        output_confidence = Dense(1, activation='sigmoid')(x)
+        output = concatenate([output_coords, output_confidence], axis=1)
         concatenated_outputs = concatenate([concatenated_outputs, output], axis=1)
 
-    reshaped_outputs = Reshape((num_objects, 2))(concatenated_outputs)
+    reshaped_outputs = Reshape((num_objects, 3))(concatenated_outputs)
 
     # Create the model
     model = Model(inputs=input1, outputs=reshaped_outputs)

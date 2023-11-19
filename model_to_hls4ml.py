@@ -6,24 +6,25 @@ from qresnet_and_mlp import qresnetModelWithLocalization
 import keras
 import os
 
-os.environ['PATH'] += os.pathsep + '/tools/Xilinx/Vitis_HLS/2023.1/bin'
+# os.environ['PATH'] += os.pathsep + '/tools/Xilinx/Vitis_HLS/2023.1/bin'
 # os.environ['PATH'] += os.pathsep + "/tools/Xilinx/Vitis_HLS/2022.2/bin"
+os.environ['PATH'] += os.pathsep + "/tools/Xilinx/Vitis_HLS/2022.1/bin"
 
-model = qresnetModelWithLocalization(5)
+model = qresnetModelWithLocalization(1)
 
 model.summary()
 
-config = hls4ml.utils.config_from_keras_model(model, granularity="name")
+config = hls4ml.utils.config_from_keras_model(model, granularity="name", default_reuse_factor=1)
 
 # print(config)
 
 # Set the precision and reuse factor for the full model
 config['Model']['Precision'] = 'ap_fixed<16,6>'
-config['Model']['ReuseFactor'] = 1
+# config['Model']['ReuseFactor'] = 1
 
 for layer in config['LayerName'].keys():
     config['LayerName'][layer]['Strategy'] = 'latency'
-    config['LayerName'][layer]['ReuseFactor'] = 64
+    # config['LayerName'][layer]['ReuseFactor'] = 1
 
 for layer in model.layers:
     if layer.__class__.__name__ in ['QConv2D', 'QDense']:
@@ -32,7 +33,7 @@ for layer in model.layers:
         # print("{}: {}".format(layer.name, layersize))  # 0 = weights, 1 = biases
         if layersize > 4096:  # assuming that shape[0] is batch, i.e., 'None'
             print("Layer {} is too large ({}), are you sure you want to train?".format(layer.name, layersize))
-            config['LayerName'][layer.name]['Strategy'] = 'resource'
+            # config['LayerName'][layer.name]['Strategy'] = 'resource'
     # elif layer.__class__.__name__ in ["Flatten", "Concatenate"]:
     #         print(layer.name)
     #         config['LayerName'][layer.name]['Strategy'] = 'resource'
@@ -58,7 +59,9 @@ cfg['IOType'] = 'io_stream'  # Must set this if using CNNs!
 cfg['HLSConfig'] = config
 cfg['KerasModel'] = model
 cfg['OutputDir'] = 'model_1/'
-cfg['Part'] = 'xc7z030sbv485-3'
+cfg['Part'] = 'xcu250-figd2104-2L-e'
+# cfg['Part'] = 'xczu7cg-fbvb900-1-e'
+# cfg['Part'] = 'xc7z030sbv485-3' #Zynq-7000
 
 hls_model = hls4ml.converters.keras_to_hls(cfg)
 
