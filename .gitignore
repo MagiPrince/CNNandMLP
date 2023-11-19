@@ -2,3 +2,4 @@ env
 model_*
 __pycache__
 *.h5
+hls4ml_synthesis_reuse_1
