@@ -107,8 +107,8 @@ for folder_element, jet_file in enumerate(dir_files_jet):
         tmp_labels = []
         cnt = 0
         # Create a matrix that will contain the position of the jet that each neuron should detect
-        array = np.concatenate((matrix_of_centers, np.zeros((round(NB_NEURON_BY_SIDE), round(NB_NEURON_BY_SIDE), 1))), axis=-1)
-        matrix_of_closest_jet_coordinates = np.c_[copy.deepcopy(matrix_of_centers), np.zeros((len(matrix_of_centers), len(matrix_of_centers), 1), dtype=matrix_of_centers.dtype)]# np.ones((round(NB_NEURON_BY_SIDE), round(NB_NEURON_BY_SIDE), 3)) * [55, 32, 0]
+        # array = np.concatenate((matrix_of_centers, np.zeros((round(NB_NEURON_BY_SIDE), round(NB_NEURON_BY_SIDE), 1))), axis=-1)
+        matrix_of_closest_jet_coordinates = np.c_[copy.deepcopy(matrix_of_centers), np.zeros((len(matrix_of_centers), len(matrix_of_centers), 3), dtype=matrix_of_centers.dtype)]# np.ones((round(NB_NEURON_BY_SIDE), round(NB_NEURON_BY_SIDE), 3)) * [55, 32, 0]
         
         for j in range(len(df_jet['eta_rounded'])):
             # label = [55, 32, 0, 0, 0]
@@ -117,7 +117,7 @@ for folder_element, jet_file in enumerate(dir_files_jet):
                 # Check if the coordinate eta is in the covered range
                 if np.absolute(df_jet['eta_rounded'].iloc[j]) < 2 and np.absolute(df_jet['phi_rounded'].iloc[j]) < 2.75:
 
-                    tmp_labels.append([((df_jet['eta_rounded'].iloc[j] + ETA) / (ETA*2) * (LEN_ETA-1)), ((df_jet['phi_rounded'].iloc[j] + PHI) / (PHI*2) * (LEN_PHI-1)), 1])
+                    tmp_labels.append([((df_jet['eta_rounded'].iloc[j] + ETA) / (ETA*2) * (LEN_ETA-1)), ((df_jet['phi_rounded'].iloc[j] + PHI) / (PHI*2) * (LEN_PHI-1)), 10, 10, 1])
 
         # First step : Found closest jet to a neuron and if in range of the neuron assign it and remove jet from list
         for i in range(round(NB_NEURON_BY_SIDE)):

@@ -106,7 +106,7 @@ print("True positif : " + str(true_positif))
 print("False positif : " + str(false_positif))
 print("False negative : " + str(false_negative))
 
-print("F1 score : " + str((2*true_positif)/(2*true_positif+false_positif+false_negative)))
+print("F1 score : " + str((2*true_positif)/max((2*true_positif+false_positif+false_negative), 1)))
 
 # print("Boxes : ", labels_test["boxes"][:1])
 # print("Classes : ", labels_test["classes"][:1])

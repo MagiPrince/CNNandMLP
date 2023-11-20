@@ -75,13 +75,13 @@ def evaluate_model_classic(images_test, labels_test, name_weight, nb_neurons):
 
     # Starting the evaluation
     for i in range(len(results)):
-        detection_in_range= 0
+        detection_over_confidence = 0
         true_detection = 0
         coord_gt = []
 
         # Getting the labels for the current detection that are in range to be detected
         for j in range(len(labels_test[i])):
-            if labels_test[i][j][0] < 48 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5:
+            if labels_test[i][j][0] < 48 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5 and labels_test[i][j][-1] == 1:
                 coord_gt.append(copy.deepcopy(labels_test[i][j][:2].tolist()))
 
         nb_gt += len(coord_gt)
@@ -90,21 +90,24 @@ def evaluate_model_classic(images_test, labels_test, name_weight, nb_neurons):
             boxes_gt_for_pxrc[str(iou_threshold)] = copy.deepcopy(coord_gt)
 
         for j in range(len(results[i])):
-            if results[i][j][0] < 48 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59:# and results[i][j][-1] > CONFIDENCE:
-                detection_in_range += 1
+            if results[i][j][0] < 48 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59:
                 index_iou = -1
                 best_iou = -1
                 pred_box = [results[i][j][0]-5, results[i][j][1]-5, 10, 10]
-                for k in range(len(coord_gt)):
-                    gt_box = [coord_gt[k][0]-5, coord_gt[k][1]-5, 10, 10]
-                    iou = intersection_over_union(gt_box, pred_box)
-                    if iou > best_iou:
-                        best_iou = iou
-                        index_iou = k
-                
-                if best_iou >= IOU_THRESHOLD:
-                    coord_gt.pop(index_iou)
-                    true_detection += 1
+                confidence_of_current_box = results[i][j][-1]
+
+                if confidence_of_current_box >= CONFIDENCE:
+                    detection_over_confidence += 1
+                    for k in range(len(coord_gt)):
+                        gt_box = [coord_gt[k][0]-5, coord_gt[k][1]-5, 10, 10]
+                        iou = intersection_over_union(gt_box, pred_box)
+                        if iou > best_iou:
+                            best_iou = iou
+                            index_iou = k
+                    
+                    if best_iou >= IOU_THRESHOLD:
+                        coord_gt.pop(index_iou)
+                        true_detection += 1
 
                 for iou_threshold in iou_threshold_array:
                     # Computing data to generate precision x recall curve
@@ -120,22 +123,28 @@ def evaluate_model_classic(images_test, labels_test, name_weight, nb_neurons):
 
                     if best_iou >= float(iou_threshold):
                         boxes_gt_for_pxrc[str(iou_threshold)].pop(index_iou)
-                        prediction_dict[str(iou_threshold)].append(True)
+                        prediction_dict[str(iou_threshold)].append((confidence_of_current_box, True))
                     else:
-                        prediction_dict[str(iou_threshold)].append(False)
+                        prediction_dict[str(iou_threshold)].append((confidence_of_current_box, False))
         
         true_positif += true_detection
-        false_positif += detection_in_range-true_detection
+        false_positif += detection_over_confidence-true_detection
         false_negative += len(coord_gt)
+
+    for iou_threshold in iou_threshold_array:
+        prediction_dict[str(iou_threshold)] = sorted(prediction_dict[str(iou_threshold)], key=lambda x: x[0], reverse=True)
 
     print("True positif : " + str(true_positif))
     print("False positif : " + str(false_positif))
     print("False negative : " + str(false_negative))
 
-    print("F1 score : " + str((2*true_positif)/(2*true_positif+false_positif+false_negative)))
+    f1_score = (2*true_positif)/(2*true_positif+false_positif+false_negative)
+
+    print("F1 score : " + str(f1_score))
 
     # print("Boxes : ", labels_test["boxes"][:1])
     # print("Classes : ", labels_test["classes"][:1])
+    return true_positif, false_positif, false_negative, f1_score, prediction_dict, nb_gt
 
 
 def main():
@@ -146,6 +155,9 @@ def main():
 
     labels_test = np.load("labels_test.npy")[0]
 
+    true_positif, false_positif, false_negative, f1_score, prediction_dict, nb_gt = evaluate_model_classic(images_test, labels_test, 'cnn_and_mlp_4_n_neurons', 64)
+
+    print("F1 score : " + str(f1_score))
 
 if __name__ == "__main__":
     main()
