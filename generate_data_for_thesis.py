@@ -17,8 +17,8 @@ def custom_loss(y_true, y_pred):
     # Combine both losses
     return coords_loss + confidence_loss
 
-NB_NEURONS = 64
-NAME_WEIGHTS = "resnet18_cnn_"+str(NB_NEURONS)+"n_x_y_conf"
+NB_NEURONS = 121
+NAME_WEIGHTS = "resnet18_cnn_"+str(NB_NEURONS)+"n121_x_y_conf"
 
 images = np.load("matrices_training.npy")
 
@@ -38,7 +38,7 @@ array_epochs_b4_evaluation = [2, 3, 5, 10, 10, 20, 50, 200, 200]
 dict_results = {}
 
 # Loop of the number of models we are going to train to get training and results data
-for iteration in range(5, 10):
+for iteration in range(0, 5):
     print("--------------------- Experience " + str(iteration) + " ---------------------")
     # Creating model for this experience
     tf.keras.utils.set_random_seed((iteration+1)*17*100)

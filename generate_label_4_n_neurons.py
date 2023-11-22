@@ -7,7 +7,7 @@ import sys
 
 path_jet = "data/jet/"
 
-NEURONS = 64
+NEURONS = 121
 
 ETA = 2.4
 PHI = 3.15
@@ -61,7 +61,7 @@ dir_files_jet = sorted(dir_files_jet)
 
 print("Median : " + str(MEDIAN))
 print("Size side : " + str(SIZE_SIDE))
-print("Size neuron side : " + str(NB_NEURON_BY_SIDE))
+print("Nb neuron by side : " + str(NB_NEURON_BY_SIDE))
 
 array_of_medians = np.arange(start=MEDIAN, stop=SIZE_MATRIX, step=SIZE_SIDE)
 
@@ -141,7 +141,7 @@ for folder_element, jet_file in enumerate(dir_files_jet):
             if count_nb_available_neurons(matrix_of_closest_jet_coordinates) <= 0:
                 break
             closest_neuron_index = [-1, -1]
-            dist_of_closest_neuron = 64
+            dist_of_closest_neuron = SIZE_MATRIX
             for i in range(round(NB_NEURON_BY_SIDE)):
                 for j in range(round(NB_NEURON_BY_SIDE)):
                     if (matrix_of_closest_jet_coordinates[i][j][-1] == 0):# [55, 32]).all():
