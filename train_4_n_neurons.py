@@ -16,7 +16,7 @@ images = np.load("matrices_training.npy")
 
 labels = np.load("labels_training_4_n_neurons.npy")
 
-model = resnetModelWithLocalization(64)
+model = qresnetModelWithLocalization(64)
 
 def coordinates_loss(y_true, y_pred):
     return tf.keras.losses.mean_squared_error(y_true[:, :, :2], y_pred[:, :, :2])
@@ -74,7 +74,7 @@ else:
     mcp_save_accuracy_max = ModelCheckpoint('accuracy_max_4_n_neurons.h5', save_best_only=True, save_weights_only=True, monitor='accuracy', mode='max')
     reduce_lr_loss = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=500, verbose=1, mode='min')
 
-    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=500, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, mcp_save_val_accuracy_max, mcp_save_accuracy_max, reduce_lr_loss])
+    model.fit(images, labels, validation_data=(images_validation, labels_validation), epochs=2000, batch_size=64, callbacks=[mcp_save_val_loss_min, mcp_save_loss_min, mcp_save_val_accuracy_max, mcp_save_accuracy_max])
 
     model.save_weights(NAME_BACKBONE+".h5", overwrite="True", save_format="h5", options=None)
 

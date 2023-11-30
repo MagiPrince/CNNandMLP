@@ -34,7 +34,7 @@ def resnetModelWithLocalization(num_objects):
     x = Conv2D(64, (7, 7), strides=(2, 2), padding='same')(input1)
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
-    x = MaxPooling2D((3, 3))(x)
+    x = MaxPooling2D((3, 3), strides=(2, 2))(x)
     
     # Residual blocks
     x = basic_block(x, 64)

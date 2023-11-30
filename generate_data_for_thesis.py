@@ -5,7 +5,7 @@ import os
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 from resnet_and_mlp import resnetModelWithLocalization
 from qresnet_and_mlp import qresnetModelWithLocalization
-from evaluate_model_classic import evaluate_model_classic
+from evaluate_model_classic import evaluate_model_classic, qevaluate_model_classic
 
 def custom_loss(y_true, y_pred):
     # Coordinates loss
@@ -18,7 +18,7 @@ def custom_loss(y_true, y_pred):
     return coords_loss + confidence_loss
 
 NB_NEURONS = 121
-NAME_WEIGHTS = "resnet18_cnn_"+str(NB_NEURONS)+"n121_x_y_conf"
+NAME_WEIGHTS = "resnet18_cnn_"+str(NB_NEURONS)+"n_x_y_conf_corrected"
 
 images = np.load("matrices_training.npy")
 
@@ -32,8 +32,10 @@ images_test = np.load("matrices_test.npy")
 
 labels_test = np.load("labels_test_4_n_neurons.npy")
 
-array_epochs = [2, 5, 10, 20, 30, 50, 100, 300, 500]
-array_epochs_b4_evaluation = [2, 3, 5, 10, 10, 20, 50, 200, 200]
+print(labels_test[0])
+
+array_epochs = [2, 5, 10, 20, 30, 50, 100, 300, 500]#, 750, 1000, 1250]
+array_epochs_b4_evaluation = [2, 3, 5, 10, 10, 20, 50, 200, 200]#, 250, 250, 250]
 
 dict_results = {}
 
@@ -45,6 +47,8 @@ for iteration in range(0, 5):
     model = resnetModelWithLocalization(NB_NEURONS)
 
     model.compile(optimizer=tf.optimizers.Adam(learning_rate=0.001), loss=custom_loss, metrics=['accuracy'])
+
+    model.summary()
 
     # Setting or creating variables for this experience
     dict_results[str(iteration)] = {}
@@ -73,7 +77,7 @@ for iteration in range(0, 5):
     dict_results[str(iteration)]['loss'] = loss_history
     dict_results[str(iteration)]['val_loss'] = val_loss_history
 
-np.save(NAME_WEIGHTS+'_second_part_0_5_05_095.npy', dict_results)
+np.save(NAME_WEIGHTS+'_0_5_05_095.npy', dict_results)
 
 # acc = model.history.history['val_accuracy']
 # print(acc) # [0.9573, 0.9696, 0.9754, 0.9762, 0.9784]

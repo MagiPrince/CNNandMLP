@@ -51,7 +51,7 @@ print("Nb images : " + str(len(images_test)))
 
 labels_test = np.load("labels_test_4_n_neurons.npy")
 
-model = resnetModelWithLocalization(64)
+model = qresnetModelWithLocalization(64)
 
 if not os.path.isfile(NAME_BACKBONE+".h5"):
     sys.exit(1)
