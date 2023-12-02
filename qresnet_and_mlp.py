@@ -57,7 +57,7 @@ def qresnetModelWithLocalization(num_objects):
     #             use_bias=True)(x)
     # x = QBatchNormalization()(x)
     # x = QActivation(quantized_relu(bits, 6))(x)
-    x = MaxPooling2D((3, 3))(x)
+    x = MaxPooling2D((3, 3), strides=(2, 2))(x)
     # x = Conv2D(1, (3, 3), strides=(2, 2), padding='same')(x)
     
     # Residual blocks

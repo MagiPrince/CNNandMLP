@@ -81,7 +81,7 @@ def evaluate_model_classic(images_test, labels_test, name_weight, nb_neurons):
 
         # Getting the labels for the current detection that are in range to be detected
         for j in range(len(labels_test[i])):
-            if labels_test[i][j][0] < 48 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5 and labels_test[i][j][-1] == 1:
+            if labels_test[i][j][0] < 44 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 49 and labels_test[i][j][1] > 5 and labels_test[i][j][-1] == 1:
                 coord_gt.append(copy.deepcopy(labels_test[i][j][:2].tolist()))
 
         nb_gt += len(coord_gt)
@@ -90,7 +90,7 @@ def evaluate_model_classic(images_test, labels_test, name_weight, nb_neurons):
             boxes_gt_for_pxrc[str(iou_threshold)] = copy.deepcopy(coord_gt)
 
         for j in range(len(results[i])):
-            if results[i][j][0] < 48 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59:
+            if results[i][j][0] < 44 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59:
                 index_iou = -1
                 best_iou = -1
                 pred_box = [results[i][j][0]-5, results[i][j][1]-5, 10, 10]
@@ -184,7 +184,7 @@ def qevaluate_model_classic(images_test, labels_test, name_weight, nb_neurons):
 
         # Getting the labels for the current detection that are in range to be detected
         for j in range(len(labels_test[i])):
-            if labels_test[i][j][0] < 48 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5 and labels_test[i][j][-1] == 1:
+            if labels_test[i][j][0] < 44 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5 and labels_test[i][j][-1] == 1:
                 coord_gt.append(copy.deepcopy(labels_test[i][j][:2].tolist()))
 
         nb_gt += len(coord_gt)
@@ -193,7 +193,7 @@ def qevaluate_model_classic(images_test, labels_test, name_weight, nb_neurons):
             boxes_gt_for_pxrc[str(iou_threshold)] = copy.deepcopy(coord_gt)
 
         for j in range(len(results[i])):
-            if results[i][j][0] < 48 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59:
+            if results[i][j][0] < 44 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59:
                 index_iou = -1
                 best_iou = -1
                 pred_box = [results[i][j][0]-5, results[i][j][1]-5, 10, 10]

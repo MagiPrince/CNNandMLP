@@ -17,8 +17,8 @@ def custom_loss(y_true, y_pred):
     # Combine both losses
     return coords_loss + confidence_loss
 
-NB_NEURONS = 121
-NAME_WEIGHTS = "resnet18_cnn_"+str(NB_NEURONS)+"n_x_y_conf_corrected"
+NB_NEURONS = 64
+NAME_WEIGHTS = "resnet18_cnn_"+str(NB_NEURONS)+"n_x_y_conf_corrected_final"
 
 images = np.load("matrices_training.npy")
 
@@ -32,7 +32,7 @@ images_test = np.load("matrices_test.npy")
 
 labels_test = np.load("labels_test_4_n_neurons.npy")
 
-print(labels_test[0])
+# print(labels_test[0])
 
 array_epochs = [2, 5, 10, 20, 30, 50, 100, 300, 500]#, 750, 1000, 1250]
 array_epochs_b4_evaluation = [2, 3, 5, 10, 10, 20, 50, 200, 200]#, 250, 250, 250]
@@ -48,7 +48,7 @@ for iteration in range(0, 5):
 
     model.compile(optimizer=tf.optimizers.Adam(learning_rate=0.001), loss=custom_loss, metrics=['accuracy'])
 
-    model.summary()
+    # model.summary()
 
     # Setting or creating variables for this experience
     dict_results[str(iteration)] = {}

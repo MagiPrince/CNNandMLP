@@ -8,7 +8,7 @@ import os
 import sys
 import copy
 
-NAME_BACKBONE = "cnn_and_mlp_4_n_neurons"
+NAME_BACKBONE = "cnn_test_4_n"
 CONFIDENCE = 0.5
 IOU_THRESHOLD = 0.5
 
@@ -51,7 +51,7 @@ print("Nb images : " + str(len(images_test)))
 
 labels_test = np.load("labels_test_4_n_neurons.npy")
 
-model = qresnetModelWithLocalization(64)
+model = resnetModelWithLocalization(16)
 
 if not os.path.isfile(NAME_BACKBONE+".h5"):
     sys.exit(1)
@@ -78,17 +78,17 @@ for i in range(len(results)):
 
     coord_gt = []
     for j in range(len(labels_test[i])):
-        if labels_test[i][j][0] < 48 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5 and labels_test[i][j][-1] == 1:
+        if labels_test[i][j][0] < 45 and labels_test[i][j][0] > 4 and labels_test[i][j][1] < 60 and labels_test[i][j][1] > 4 and labels_test[i][j][-1] == 1:
             coord_gt.append(copy.deepcopy(labels_test[i][j].tolist()))
 
     for j in range(len(results[i])):
-        if results[i][j][0] < 48 and results[i][j][0] > 5 and results[i][j][1] > 5 and results[i][j][1] < 59 and results[i][j][-1] >= CONFIDENCE:
+        if results[i][j][0] < 45 and results[i][j][0] > 4 and results[i][j][1] > 4 and results[i][j][1] < 60 and results[i][j][-1] >= CONFIDENCE:
             detection_in_range += 1
             index_iou = -1
             best_iou = -1
             for k in range(len(coord_gt)):
-                gt_box = [coord_gt[k][0]-5, coord_gt[k][1]-5, 10, 10]
-                pred_box = [results[i][j][0]-5, results[i][j][1]-5, 10, 10]
+                gt_box = [coord_gt[k][0]-4, coord_gt[k][1]-4, 8, 8]
+                pred_box = [results[i][j][0]-4, results[i][j][1]-4, 8, 8]
                 iou = intersection_over_union(gt_box, pred_box)
                 if iou > best_iou:
                     best_iou = iou

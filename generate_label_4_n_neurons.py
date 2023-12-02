@@ -7,7 +7,7 @@ import sys
 
 path_jet = "data/jet/"
 
-NEURONS = 121
+NEURONS = 16
 
 ETA = 2.4
 PHI = 3.15
@@ -64,6 +64,8 @@ print("Size side : " + str(SIZE_SIDE))
 print("Nb neuron by side : " + str(NB_NEURON_BY_SIDE))
 
 array_of_medians = np.arange(start=MEDIAN, stop=SIZE_MATRIX, step=SIZE_SIDE)
+
+print(array_of_medians[0])
 
 matrix_of_centers = np.zeros((round(NB_NEURON_BY_SIDE), round(NB_NEURON_BY_SIDE), 2))
 for i in range(round(NB_NEURON_BY_SIDE)):
@@ -122,7 +124,7 @@ for folder_element, jet_file in enumerate(dir_files_jet):
         # First step : Found closest jet to a neuron and if in range of the neuron assign it and remove jet from list
         for i in range(round(NB_NEURON_BY_SIDE)):
             for j in range(round(NB_NEURON_BY_SIDE)):
-                dist_of_closest_jet = np.sqrt(pow(SIZE_SIDE/2-0, 2)+pow(SIZE_SIDE/2-0, 2))
+                dist_of_closest_jet = array_of_medians[0] #np.sqrt(pow(SIZE_SIDE/2-0, 2)+pow(SIZE_SIDE/2-0, 2))
                 index_of_jet = -1
                 for k in range(len(tmp_labels)):
                     # compute distance between center of neuron node and jet
@@ -178,7 +180,6 @@ print(np.array(labels_validation).shape)
 
     # if folder_element+1 >= 4:
     #     break
-
 
 np.save("labels_training_4_n_neurons.npy", np.array(labels_training))
 np.save("labels_validation_4_n_neurons.npy", np.array(labels_validation))

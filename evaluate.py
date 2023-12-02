@@ -9,7 +9,7 @@ import sys
 import copy
 import random
 
-NAME_BACKBONE = "cnn_and_mlp"
+NAME_BACKBONE = "cnn_test"
 CONFIDENCE = 0.5
 IOU_THRESHOLD = 0.5
 
@@ -50,9 +50,9 @@ images_test = np.load("matrices_test.npy")
 
 print("Nb images : " + str(len(images_test)))
 
-labels_test = np.load("labels_test.npy")[0]
+labels_test = np.load("labels_test.npy")
 
-model = resnetModelWithLocalization(30)
+model = resnetModelWithLocalization(16)
 
 if not os.path.isfile(NAME_BACKBONE+".h5"):
     sys.exit(1)
@@ -75,7 +75,7 @@ for i in range(len(results)):
     true_detection = 0
 
     coord_gt = []
-    for j in range(30):
+    for j in range(16):
         if labels_test[i][j][0] < 48 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5:
             coord_gt.append(copy.deepcopy(labels_test[i][j][:2].tolist()))
 
