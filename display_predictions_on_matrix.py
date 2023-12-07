@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
 NAME_BACKBONE = "cnn_test"
-CONFIDENCE = 0.5
+CONFIDENCE = 0.0
 IOU_THRESHOLD = 0.5
 NEURONS = 16
 SIZE_MATRIX = 64
@@ -42,7 +42,7 @@ for i in range(len(results)):
     true_detection = 0
 
     for j in range(NEURONS):
-        if results[i][j][-1] > 0.0:
+        if results[i][j][-1] > CONFIDENCE:
             # if j == 9:
             #     print(results[i][j])
             #     print([int(colors[j][0]*255), int(colors[j][1]*255), int(colors[j][2]*255)])
@@ -54,6 +54,23 @@ for i in range(len(results)):
 #         image[ceil(array_of_medians[i]+array_of_medians[0])][j] = [255, 0, 0]
 
 # print(matrix)
+
+print(np.mean(results, axis=0))
+print(np.std(results, axis=0))
+
+a_mean = np.mean(results, axis=0)
+a_std = np.std(results, axis=0)
+
+for i in range(NEURONS):
+    plt.errorbar(a_mean[i][0], a_mean[i][1], xerr=a_std[i][0], yerr=a_std[i][1], color=colors[i], fmt='-o', capsize=4)
+
+legend_elements = [Line2D([0], [0], color=colors[i], lw=2, label="D.B. : " + str(i+1)) for i in range(NEURONS)]
+plt.legend(handles=legend_elements, loc='center left', bbox_to_anchor=(1, 0.5))
+plt.xlabel("x")
+plt.ylabel("y")
+plt.xlim(0, 63)
+plt.ylim(0, 63)
+plt.show()
 
 # for i in range(NEURONS):
 plt.imshow(matrix)

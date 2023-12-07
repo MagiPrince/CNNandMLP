@@ -7,7 +7,7 @@ import sys
 
 path_jet = "data/jet/"
 
-NEURONS = 16
+NEURONS = 64
 
 ETA = 2.4
 PHI = 3.15

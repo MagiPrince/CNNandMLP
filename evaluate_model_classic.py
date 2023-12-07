@@ -81,7 +81,7 @@ def evaluate_model_classic(images_test, labels_test, name_weight, nb_neurons):
 
         # Getting the labels for the current detection that are in range to be detected
         for j in range(len(labels_test[i])):
-            if labels_test[i][j][0] < 44 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 49 and labels_test[i][j][1] > 5 and labels_test[i][j][-1] == 1:
+            if labels_test[i][j][0] < 44 and labels_test[i][j][0] > 5 and labels_test[i][j][1] < 59 and labels_test[i][j][1] > 5 and labels_test[i][j][-1] == 1:
                 coord_gt.append(copy.deepcopy(labels_test[i][j][:2].tolist()))
 
         nb_gt += len(coord_gt)
@@ -159,8 +159,6 @@ def qevaluate_model_classic(images_test, labels_test, name_weight, nb_neurons):
 
     # Get predictions using the model
     results = model.predict(images_test)
-
-    print(results[0])
 
     # Confusion Matrix
     true_positif = 0

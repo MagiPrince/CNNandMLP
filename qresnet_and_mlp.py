@@ -6,7 +6,7 @@ from keras.models import Model
 from qkeras import *
 import contextlib
 
-bits = 16
+bits = 8
 set_internal_sigmoid("real")
 
 def basic_block(x, filters, strides=(1, 1)):
@@ -80,7 +80,9 @@ def qresnetModelWithLocalization(num_objects):
     output_conf = QDense(1, kernel_quantizer= quantized_bits(bits, 0, alpha=1),
                         bias_quantizer=quantized_bits(bits, 0, alpha=1),
                         use_bias=True)(x) # Output : confidence
-    concatenated_outputs = concatenate([QActivation(quantized_relu(bits, 6))(output_coords), QActivation(quantized_sigmoid(bits))(output_conf)], axis=1)
+    output_coords_a = QActivation(quantized_relu(bits, 6))(output_coords)
+    output_conf_a = QActivation(quantized_sigmoid(bits))(output_conf)
+    concatenated_outputs = concatenate([output_coords_a, output_conf_a], axis=1)
     for _ in range(num_objects-1):
         output_coords = QDense(2, kernel_quantizer= quantized_bits(bits, 0, alpha=1),
                         bias_quantizer=quantized_bits(bits, 0, alpha=1),
@@ -88,7 +90,9 @@ def qresnetModelWithLocalization(num_objects):
         output_conf = QDense(1, kernel_quantizer= quantized_bits(bits, 0, alpha=1),
                         bias_quantizer=quantized_bits(bits, 0, alpha=1),
                         use_bias=True)(x) # Output : confidence
-        output = concatenate([QActivation(quantized_relu(bits, 6))(output_coords), QActivation(quantized_sigmoid(bits))(output_conf)], axis=1)
+        output_coords_a = QActivation(quantized_relu(bits, 6))(output_coords)
+        output_conf_a = QActivation(quantized_sigmoid(bits))(output_conf)
+        output = concatenate([output_coords_a, output_conf_a], axis=1)
         concatenated_outputs = Concatenate(axis=-1)([concatenated_outputs, output])
 
 
